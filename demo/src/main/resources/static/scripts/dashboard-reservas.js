@@ -35,6 +35,7 @@ if (reserveForm) {
   reserveForm.addEventListener('submit', e => {
     e.preventDefault();
 
+
     const name   = document.getElementById('resName').value.trim();
     const date   = document.getElementById('resDate').value;
     const time   = document.getElementById('resTime').value;
@@ -94,11 +95,12 @@ function renderReservas(lista) {
   if (!reserveList) return;
   reserveList.innerHTML = '';
 
-  lista.forEach(res => {
+  lista.forEach((res, index) => {
     const tr = document.createElement('tr');
-    tr.dataset.id = res.id;
+    tr.dataset.id = res.id || index+1;
 
     tr.innerHTML = `
+      <td>${res.id || index + 1}</td> 
       <td>${escapeHtml(res.name)}</td>
       <td>${escapeHtml(res.date)}</td>
       <td>${escapeHtml(res.time)}</td>
