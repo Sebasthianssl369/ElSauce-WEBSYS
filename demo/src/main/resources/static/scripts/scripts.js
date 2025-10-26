@@ -62,19 +62,12 @@ window.addEventListener("click", function (event) {
   }
 });
 
-// Enviar formulario de registro (usa validación HTML5)
+// Enviar formulario de registro
 document.getElementById("formReserva").addEventListener("submit", function (e) {
-  if (!this.checkValidity()) {
-    // Si hay campos vacíos, dejamos que el navegador muestre el tooltip
-    return;
-  }
-
-  e.preventDefault(); // Si es válido, detenemos el envío normal
-  let nombre = document.getElementById("nombre").value;
-  alert("✅ Te has registrado con éxito. ¡Gracias " + nombre + "!");
-  document.getElementById("modalReserva").style.display = "none";
-  this.reset();
+  if (!this.checkValidity()) return; // deja que el navegador valide
+  // ✅ no bloqueamos el envío, permitimos que vaya al backend
 });
+
 
 // === LOGIN ===
 
@@ -96,17 +89,13 @@ window.addEventListener("click", function (event) {
   }
 });
 
-//Enviar formulario de login
+// Enviar formulario de login
 document.getElementById("formLogin").addEventListener("submit", function (e) {
   if (!this.checkValidity()) {
-    // Si falta algo, deja que el navegador muestre la nube de error
     return;
   }
 
-  e.preventDefault(); 
-  alert("👋 Bienvenido");
-  document.getElementById("modalLogin").style.display = "none";
-  this.reset();
+  // ⚠️ Tampoco prevenimos el envío — Thymeleaf lo manejará con el POST /auth/login
 });
 
 // Abrir registro desde el login
@@ -114,6 +103,8 @@ document.getElementById("openRegistro").onclick = function () {
   document.getElementById("modalLogin").style.display = "none";
   document.getElementById("modalReserva").style.display = "block";
 };
+
+
 
 
 // =========================

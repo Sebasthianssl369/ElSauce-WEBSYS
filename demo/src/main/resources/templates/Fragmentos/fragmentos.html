@@ -24,7 +24,7 @@
   <div class="modal-content">
     <span class="close">&times;</span>
     <h2>Registrate con nosotros</h2>
-    <form id="formReserva">
+    <form id="formReserva" th:action="@{/auth/register}" method="post">
         <label for="nombre">Nombre:</label>
         <input type="text" id="nombre" required><br>
 
@@ -51,7 +51,7 @@
   <div class="modal-content">
     <span class="close">&times;</span>
     <h2>Inicia sesión</h2>
-    <form id="formLogin">
+    <form id="formLogin" th:action="@{/auth/login}" method="post">
         <label for="correo">Correo:</label>
         <input type="email" id="correoLogin" required><br>
 
