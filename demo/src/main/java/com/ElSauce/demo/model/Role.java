@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 public class Role {
 
     @Id
-    private Short id; // tinyint unsigned → short o byte
+    private Integer id; // tinyint unsigned → short o byte
 
     @Column(nullable = false, unique = true, length = 50)
     private String nombre;
@@ -29,11 +29,11 @@ public class Role {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public Short getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Short id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

@@ -42,67 +42,51 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 });
-// === REGISTRO ===
+document.addEventListener("DOMContentLoaded", () => {
+  const modalLogin = document.getElementById("modalLogin");
+  const modalReserva = document.getElementById("modalReserva");
+  const btnOpenLogin = document.getElementById("openLogin");
+  const btnOpenRegistro = document.getElementById("openRegistro");
+  const closes = document.querySelectorAll(".close");
 
-// Abrir modal de registro
-document.getElementById("openReserva").onclick = function () {
-  document.getElementById("modalLogin").style.display = "none";
-  document.getElementById("modalReserva").style.display = "block";
-};
+  // 🔹 Al hacer clic en el botón "Inicia sesión" (de la página principal)
+  btnOpenLogin.addEventListener("click", () => {
+    modalLogin.style.display = "block";
+    modalReserva.style.display = "none";
+  });
 
-// Cerrar modal de registro (botón X)
-document.querySelector("#modalReserva .close").onclick = function () {
-  document.getElementById("modalReserva").style.display = "none";
-};
+  // 🔹 Dentro del login, botón "¿No tienes cuenta? Regístrate"
+  btnOpenRegistro.addEventListener("click", () => {
+    modalLogin.style.display = "none";
+    modalReserva.style.display = "block";
+  });
 
-// Cerrar modal de registro si clic fuera del contenido
-window.addEventListener("click", function (event) {
-  if (event.target === document.getElementById("modalReserva")) {
-    document.getElementById("modalReserva").style.display = "none";
-  }
-});
-
-// Enviar formulario de registro
-document.getElementById("formReserva").addEventListener("submit", function (e) {
-  if (!this.checkValidity()) return; // deja que el navegador valide
-  // ✅ no bloqueamos el envío, permitimos que vaya al backend
-});
-
-
-// === LOGIN ===
-
-// Abrir modal de login
-document.getElementById("openLogin").onclick = function () {
-  document.getElementById("modalLogin").style.display = "block";
-  document.getElementById("modalReserva").style.display = "none";
-};
-
-// Cerrar modal de login (botón X)
-document.querySelector("#modalLogin .close").onclick = function () {
-  document.getElementById("modalLogin").style.display = "none";
-};
-
-// Cerrar modal de login si clic fuera del contenido
-window.addEventListener("click", function (event) {
-  if (event.target === document.getElementById("modalLogin")) {
-    document.getElementById("modalLogin").style.display = "none";
-  }
-});
-
-// Enviar formulario de login
-document.getElementById("formLogin").addEventListener("submit", function (e) {
-  if (!this.checkValidity()) {
-    return;
+  // 🔹 Dentro del registro, botón "¿Ya tienes cuenta? Inicia sesión"
+  const btnVolverLogin = document.getElementById("openLoginModal");
+  if (btnVolverLogin) {
+    btnVolverLogin.addEventListener("click", () => {
+      modalReserva.style.display = "none";
+      modalLogin.style.display = "block";
+    });
   }
 
-  // ⚠️ Tampoco prevenimos el envío — Thymeleaf lo manejará con el POST /auth/login
+  // 🔹 Cerrar al hacer clic en la X
+  closes.forEach(close => {
+    close.addEventListener("click", () => {
+      modalLogin.style.display = "none";
+      modalReserva.style.display = "none";
+    });
+  });
+
+  // 🔹 Cerrar al hacer clic fuera del contenido
+  window.addEventListener("click", (event) => {
+    if (event.target === modalLogin || event.target === modalReserva) {
+      modalLogin.style.display = "none";
+      modalReserva.style.display = "none";
+    }
+  });
 });
 
-// Abrir registro desde el login
-document.getElementById("openRegistro").onclick = function () {
-  document.getElementById("modalLogin").style.display = "none";
-  document.getElementById("modalReserva").style.display = "block";
-};
 
 
 
