@@ -1,56 +1,48 @@
 package com.ElSauce.demo.model;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @NoArgsConstructor
 @Entity
-@Table(name = "roles")
-public class Role {
-
+@Table(name = "horarios_prefijados")
+public class HorarioPrefijado {
     @Id
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Short id;
 
-    @Column(name = "nombre", length = 50, nullable = false, unique = true)
-    private String nombre;
+    private LocalTime hora;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    //Getter and Setter
-    public Integer getId() {
+    //Getter y Setter
+    public Short getId() {
         return id;
     }
-
-    public void setId(Integer id) {
+    public void setId(Short id) {
         this.id = id;
     }
-
-    public String getNombre() {
-        return nombre;
+    public LocalTime getHora() {
+        return hora;
     }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setHora(LocalTime hora) {
+        this.hora = hora;
     }
-
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
-
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
-
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
-
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }

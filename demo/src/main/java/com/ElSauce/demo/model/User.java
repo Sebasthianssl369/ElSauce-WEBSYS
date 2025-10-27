@@ -1,8 +1,12 @@
 package com.ElSauce.demo.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+@NoArgsConstructor
 @Entity
 @Table(name = "users")
 public class User {
@@ -11,58 +15,52 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
     private String nombre;
     private String apellido;
 
-    @Column(nullable = false, unique = true, length = 150)
+    @Column(unique = true, length = 150, nullable = false)
     private String email;
 
-    @Column(name = "password_hash", nullable = false, length = 255)
+    @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
     @Column(length = 20)
     private String telefono;
-
+/* 
     @Enumerated(EnumType.STRING)
-    @Column(name = "tipo_documento", length = 10)
+    @Column(name = "tipo_documento")
     private TipoDocumento tipoDocumento = TipoDocumento.DNI;
-
-    @Column(name = "numero_documento", length = 50)
+*/
+    @Column(name = "numero_documento")
     private String numeroDocumento;
 
-    @Column(name = "razon_social", length = 200)
+    @Column(name = "razon_social")
     private String razonSocial;
 
-    @Column(name = "direccion_fiscal", length = 300)
+    @Column(name = "direccion_fiscal")
     private String direccionFiscal;
 
-    @Column(name = "email_facturacion", length = 150)
+    @Column(name = "email_facturacion")
     private String emailFacturacion;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @Column(name = "is_active")
+    private Boolean isActive = true;
+
+    @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Reserva> reservas;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
-
+    //Getter y Setter
     public Long getId() {
         return id;
     }
@@ -109,14 +107,6 @@ public class User {
 
     public void setTelefono(String telefono) {
         this.telefono = telefono;
-    }
-
-    public TipoDocumento getTipoDocumento() {
-        return tipoDocumento;
-    }
-
-    public void setTipoDocumento(TipoDocumento tipoDocumento) {
-        this.tipoDocumento = tipoDocumento;
     }
 
     public String getNumeroDocumento() {
