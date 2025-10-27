@@ -7,6 +7,9 @@ import java.util.List;
 
 import org.hibernate.query.Page;
 
+import com.ElSauce.demo.Enum.EstadoReserva;
+import com.ElSauce.demo.Enum.TipoDocumento;
+
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
@@ -54,11 +57,30 @@ public class Reserva {
     private LocalTime horaReserva;
 
     private Integer personas;
+
+    @Enumerated(EnumType.STRING)
+    private TipoDocumento tipo = TipoDocumento.BOLETA;
+
+    @Column(name = "numero_documento", length = 50)
+    private String numeroDocumento;
+
+    @Column(length = 20)
+    private String ruc;
+
+    @Column(name = "razon_social",length = 200)
+    private String razonSocial;
+
+    @Column(name = "direccion_fiscal")
+    private String direccionFiscal;
+
+    @Column(name = "email_facturacion")
+    private String emailFacturacion;
+
     private String notas;
-/*
+
     @Enumerated(EnumType.STRING)
     private EstadoReserva estado = EstadoReserva.PENDIENTE;
-*/
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     @Column(name = "updated_at")
@@ -154,6 +176,48 @@ public class Reserva {
     }
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+    public TipoDocumento getTipo() {
+        return tipo;
+    }
+    public void setTipo(TipoDocumento tipo) {
+        this.tipo = tipo;
+    }
+    public String getNumeroDocumento() {
+        return numeroDocumento;
+    }
+    public void setNumeroDocumento(String numeroDocumento) {
+        this.numeroDocumento = numeroDocumento;
+    }
+    public String getRuc() {
+        return ruc;
+    }
+    public void setRuc(String ruc) {
+        this.ruc = ruc;
+    }
+    public String getRazonSocial() {
+        return razonSocial;
+    }
+    public void setRazonSocial(String razonSocial) {
+        this.razonSocial = razonSocial;
+    }
+    public String getDireccionFiscal() {
+        return direccionFiscal;
+    }
+    public void setDireccionFiscal(String direccionFiscal) {
+        this.direccionFiscal = direccionFiscal;
+    }
+    public String getEmailFacturacion() {
+        return emailFacturacion;
+    }
+    public void setEmailFacturacion(String emailFacturacion) {
+        this.emailFacturacion = emailFacturacion;
+    }
+    public EstadoReserva getEstado() {
+        return estado;
+    }
+    public void setEstado(EstadoReserva estado) {
+        this.estado = estado;
     }
 
 }

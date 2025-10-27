@@ -22,6 +22,18 @@ public class Role {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    //Asignacion de valores a las fechas 
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
     //Getter and Setter
     public Integer getId() {
         return id;

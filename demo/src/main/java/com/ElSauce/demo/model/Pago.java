@@ -3,6 +3,8 @@ package com.ElSauce.demo.model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.ElSauce.demo.Enum.EstadoPago;
+
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
@@ -24,18 +26,20 @@ public class Pago {
     @Column(name = "card_last4")
     private String cardLast4;
 
-    @Column(name = "card_brand")
+    @Column(name = "card_brand", length = 50)
     private String cardBrand;
 
+    @Column(length = 150)
     private String titular;
+
+    @Column(precision = 8, scale = 2)
     private BigDecimal monto;
     private String moneda = "PEN";
 
-    /*
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status")
     private EstadoPago paymentStatus = EstadoPago.PENDING;
-*/
+    
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     @Column(name = "updated_at")
@@ -102,6 +106,11 @@ public class Pago {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
-
+    public EstadoPago getPaymentStatus() {
+        return paymentStatus;
+    }
+    public void setPaymentStatus(EstadoPago paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
     
 }

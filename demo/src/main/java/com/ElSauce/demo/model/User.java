@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.ElSauce.demo.Enum.TipoDocumento;
+
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
@@ -27,11 +29,11 @@ public class User {
 
     @Column(length = 20)
     private String telefono;
-/* 
+
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_documento")
     private TipoDocumento tipoDocumento = TipoDocumento.DNI;
-*/
+
     @Column(name = "numero_documento")
     private String numeroDocumento;
 
