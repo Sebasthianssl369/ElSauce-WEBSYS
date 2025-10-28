@@ -3,7 +3,6 @@ package com.ElSauce.demo.controller;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -63,6 +62,10 @@ public class ReservaController {
         SecureRandom random = new SecureRandom();
         String idTransaccion = "PAY-" + (100000 + random.nextInt(900000));
         
+        reserva.setUser(user);
+        reserva.setMesa(mesa);
+        reserva.setZona(zona);
+
         double precio =  0;
         switch (reserva.getZona().getNombre()) {
             case "Muelle Panorámico":
@@ -78,16 +81,14 @@ public class ReservaController {
             default:
                 break;
         }
-        reserva.setUser(user);
-        reserva.setMesa(mesa);
-        reserva.setZona(zona);
+
         Reserva nuReserva = reservaService.guardarReserva(reserva);
-        pago.setMonto(BigDecimal.valueOf(precio));
         pago.setFechaTransaccion(fechaActual);
         pago.setIdTransaccion(idTransaccion);
         pago.setMetodoPago("Tarjeta");
         pago.setReserva(nuReserva);
         pagoService.guardarPago(pago);
+        pago.setMonto(BigDecimal.valueOf(precio));
         System.out.println("estas en la zona: "+reserva.getZona().getNombre());
         return "index";
     }

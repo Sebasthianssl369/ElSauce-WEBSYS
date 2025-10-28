@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import com.ElSauce.demo.model.User;
 
 import jakarta.servlet.http.HttpSession;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 
@@ -38,5 +41,14 @@ public class InicioController {
         return "noticias";
     }
  
-   
+    @GetMapping({"/login"})
+    public String login(){
+        return "login";
+    }
+    
+    
+    @GetMapping({"/registro"})
+    public String registro(){
+        return "registro";
+    }
 }

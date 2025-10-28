@@ -28,44 +28,22 @@
 </head>
 <body>
   <div th:replace="Fragmentos/fragmentos :: header"></div>
-    <section class="vh-100 gradient-custom-3 d-flex align-items-center">
-  <div class="container py-5">
-    <div class="row justify-content-center">
-      <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-        <div class="card shadow" style="border-radius: 15px;">
-          <div class="card-body p-5">
-            <h2 class="text-uppercase text-center mb-5">Inicia sesión</h2>
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Inicia sesión</h2>
+    <form id="formLogin" th:action="@{/login}" method="post">
+        <div th:replace="Fragmentos/fragmentos :: alertas"></div>
+        <label for="correo">Correo:</label>
+        <input type="email" id="correoLogin" name="email" required><br>
 
-            <form id="formLogin" th:action="@{/auth/login}" method="post" novalidate>
-              <div th:replace="Fragmentos/fragmentos :: alertas"></div>
+        <label for="password">Contraseña:</label>
+        <input type="password" id="passwordLogin" name="password" required><br>
 
-              <div class="form-outline mb-4">
-                <input type="email" id="correoLogin" name="email" class="form-control form-control-lg" required />
-                <label class="form-label" for="correoLogin">Correo electrónico</label>
-              </div>
-
-              <div class="form-outline mb-4">
-                <input type="password" id="passwordLogin" name="password" class="form-control form-control-lg" required />
-                <label class="form-label" for="passwordLogin">Contraseña</label>
-              </div>
-
-              <div class="d-flex justify-content-center mb-4">
-                <button type="submit" class="btn btn-success btn-lg w-100">
-                  Continuar
-                </button>
-              </div>
-
-              <p class="text-center text-muted mt-5 mb-0">
-                ¿No tienes cuenta?
-                <a th:href="@{registro}" class="fw-bold text-body"><u>Regístrate</u></a>
-              </p>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
+        <button class="btn-submit" type="submit" >Continuar</button>
+        
+    </form>
+    <a class="btnModal" th:href="@{/registro}">¿No tienes cuenta? Regístrate</button>
   </div>
-</section>
 
 </body>
 </html>

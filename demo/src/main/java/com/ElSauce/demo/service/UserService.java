@@ -44,6 +44,9 @@ public class UserService {
      public User login(String email, String password) {
     User user = userRepository.findByEmail(email);
     if (user != null && passwordEncoder.matches(password, user.getPasswordHash())) {
+         if (user.getRole() != null) {
+            user.getRole().getId(); // esto inicializa el proxy (no carga todo el objeto)
+        }
         return user;
     }
     return null;
