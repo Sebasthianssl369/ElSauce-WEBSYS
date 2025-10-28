@@ -14,12 +14,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 public class AdminController {
 
-    private final AdminService adminService;
-
     @Autowired
-    public AdminController(AdminService adminService) {
-        this.adminService = adminService;
-    }
+    private AdminService adminService;
+
 
     // Página inicial del login admin
     @GetMapping("/admin")
