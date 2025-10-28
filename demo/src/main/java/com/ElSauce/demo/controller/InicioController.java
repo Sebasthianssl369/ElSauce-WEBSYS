@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import com.ElSauce.demo.model.User;
 
 import jakarta.servlet.http.HttpSession;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 
