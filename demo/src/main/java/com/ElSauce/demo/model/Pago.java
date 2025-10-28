@@ -16,101 +16,81 @@ public class Pago {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "reserva_id", nullable = false)
     private Reserva reserva;
 
-    @Column(name = "payment_token")
-    private String paymentToken;
-
-    @Column(name = "card_last4")
-    private String cardLast4;
-
-    @Column(name = "card_brand", length = 50)
-    private String cardBrand;
-
-    @Column(length = 150)
-    private String titular;
-
     @Column(precision = 8, scale = 2)
     private BigDecimal monto;
-    private String moneda = "PEN";
+
+    @Column(name = "fecha_transaccion")
+    private LocalDateTime fechaTransaccion;
+
+    @Column(name = "metodo_pago")
+    private String metodoPago;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "payment_status")
-    private EstadoPago paymentStatus = EstadoPago.PENDING;
-    
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private EstadoPago estadoPago = EstadoPago.PAID;
 
+    @Column(name = "id_transaccion")
+    private String idTransaccion;
     //Getter and Setter
+
     public Long getId() {
         return id;
     }
+
     public void setId(Long id) {
         this.id = id;
     }
+
     public Reserva getReserva() {
         return reserva;
     }
+
     public void setReserva(Reserva reserva) {
         this.reserva = reserva;
     }
-    public String getPaymentToken() {
-        return paymentToken;
-    }
-    public void setPaymentToken(String paymentToken) {
-        this.paymentToken = paymentToken;
-    }
-    public String getCardLast4() {
-        return cardLast4;
-    }
-    public void setCardLast4(String cardLast4) {
-        this.cardLast4 = cardLast4;
-    }
-    public String getCardBrand() {
-        return cardBrand;
-    }
-    public void setCardBrand(String cardBrand) {
-        this.cardBrand = cardBrand;
-    }
-    public String getTitular() {
-        return titular;
-    }
-    public void setTitular(String titular) {
-        this.titular = titular;
-    }
+
     public BigDecimal getMonto() {
         return monto;
     }
+
     public void setMonto(BigDecimal monto) {
         this.monto = monto;
     }
-    public String getMoneda() {
-        return moneda;
+
+    public LocalDateTime getFechaTransaccion() {
+        return fechaTransaccion;
     }
-    public void setMoneda(String moneda) {
-        this.moneda = moneda;
+
+    public void setFechaTransaccion(LocalDateTime fechaTransaccion) {
+        this.fechaTransaccion = fechaTransaccion;
     }
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+
+    public String getMetodoPago() {
+        return metodoPago;
     }
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+
+    public void setMetodoPago(String metodoPago) {
+        this.metodoPago = metodoPago;
     }
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
+
+    public EstadoPago getEstadoPago() {
+        return estadoPago;
     }
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+
+    public void setEstadoPago(EstadoPago estadoPago) {
+        this.estadoPago = estadoPago;
     }
-    public EstadoPago getPaymentStatus() {
-        return paymentStatus;
+
+    public String getIdTransaccion() {
+        return idTransaccion;
     }
-    public void setPaymentStatus(EstadoPago paymentStatus) {
-        this.paymentStatus = paymentStatus;
+
+    public void setIdTransaccion(String idTransaccion) {
+        this.idTransaccion = idTransaccion;
     }
+    
     
 }

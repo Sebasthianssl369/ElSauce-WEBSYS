@@ -17,12 +17,12 @@
       <!-- Formulario para agregar -->
       <div id="section-add" class="section hidden">
         <h2>Agregar Reserva</h2>
-        <form id="reserveForm">
-          <input type="text" id="resName" placeholder="Nombre del cliente" required />
-          <input type="date" id="resDate" required />
-          <input type="time" id="resTime" required />
-          <input type="number" id="resPeople" min="1" placeholder="Nº de personas" required />
-          <textarea id="resNotes" placeholder="Notas (opcional)"></textarea>
+        <form th:action="@{/reserva}" id="reserveForm" th:object:="${reserva}">
+          <input type="text" id="resName" placeholder="Nombre" th:field="*{clienteNombre}" required />
+          <input type="text" id="resApe" placeholder="Apellido" th:field="*{clienteApellidos}" required />
+          <input type="date" id="resDate" required th:field="*{fechaReserva}"/>
+          <input type="time" id="resTime" required th:field="*{horaReserva}"/>
+          <input type="number" id="resPeople" min="1" placeholder="Nº de personas" th:field="*{personas}" required />
           <button type="submit">Guardar</button>
         </form>
       </div>

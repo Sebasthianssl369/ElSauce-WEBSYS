@@ -144,6 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
           selectedCell = cell;
           selectedDate = cellDate;
           reservaData.fecha = cellDate;
+          document.getElementById("inputFecha").value = cellDate.toISOString().split("T")[0];
           actualizarResumen();
         });
 
@@ -191,6 +192,7 @@ document.addEventListener("DOMContentLoaded", () => {
         selectedHourCell = cell;
         selectedHour = hora;
         reservaData.hora = hora;
+        document.getElementById("inputHora").value = hora;
         actualizarResumen();
       });
       horaGrid.appendChild(cell);
@@ -213,8 +215,11 @@ document.addEventListener("DOMContentLoaded", () => {
       slide.addEventListener("click", () => {
         slides.forEach(s => s.classList.remove("selected"));
         slide.classList.add("selected");
-        selectedZona = slide.dataset.zona;
-        reservaData.zona = selectedZona;
+        const zonaId = slide.dataset.id;
+        const zonaNombre = slide.dataset.zona;
+        selectedZona = { id: zonaId, nombre: zonaNombre };
+        reservaData.zona = selectedZona; 
+        document.getElementById("inputZona").value = zonaId;
         actualizarResumen();
       });
     });
@@ -346,7 +351,7 @@ if (formDatos) {
         <p><strong>Personas:</strong> ${reservaData.personas || ""}</p>
         <p><strong>Fecha:</strong> ${reservaData.fecha ? reservaData.fecha.toLocaleDateString() : ""}</p>
         <p><strong>Hora:</strong> ${reservaData.hora || ""}</p>
-        <p><strong>Zona:</strong> ${reservaData.zona || ""}</p>
+        <p><strong>Zona:</strong> ${reservaData.zona.nombre || ""}</p>
       `;
     }
     if (resumenFinal) {
@@ -358,7 +363,7 @@ if (formDatos) {
         <p><strong>Personas:</strong> ${reservaData.personas || ""}</p>
         <p><strong>Fecha:</strong> ${reservaData.fecha ? reservaData.fecha.toLocaleDateString() : ""}</p>
         <p><strong>Hora:</strong> ${reservaData.hora || ""}</p>
-        <p><strong>Zona:</strong> ${reservaData.zona || ""}</p>
+        <p><strong>Zona:</strong> ${reservaData.zona.nombre || ""}</p>
       `;
     }
   }

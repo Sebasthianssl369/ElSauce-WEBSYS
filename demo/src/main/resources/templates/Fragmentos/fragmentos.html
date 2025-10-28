@@ -38,6 +38,7 @@
     <span class="close">&times;</span>
     <h2>Registrate con nosotros</h2>
     <form id="formReserva" th:action="@{/auth/register}" method="post" novalidate>
+        <div th:replace="Fragmentos/fragmentos :: alertas"></div>
         <label for="nombre">Nombre:</label>
         <input type="text" id="nombre" name="nombre" required><br>
 
@@ -65,6 +66,7 @@
     <span class="close">&times;</span>
     <h2>Inicia sesión</h2>
     <form id="formLogin" th:action="@{/auth/login}" method="post" novalidate>
+        <div th:replace="Fragmentos/fragmentos :: alertas"></div>
         <label for="correo">Correo:</label>
         <input type="email" id="correoLogin" name="email" required><br>
 
@@ -79,64 +81,96 @@
   
 </div>
 
-    <!--Header-->
-    <div th:fragment="header" class="navbar">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#">
-        <img th:src="@{imgs/logo_el_sauce.png}" alt="El Sauce" class="logo">
-        
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+<!-- Header -->
+<div th:fragment="header" class="navbar">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" th:href="@{/index}">
+        <img th:src="@{imgs/logo_el_sauce.png}" alt="El Sauce" class="logo" />
+      </a>
 
-        <li class="nav-item">
-          <a class="nav-link" th:href="@{/index}">Inicio</a>
-        </li>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+              data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+              aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-        <li class="nav-item">
-          <a class="nav-link" th:href="@{/nosotros}">Nosotros</a>
-        </li>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="true">Nuestra Carta</a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" th:href="@{/index#nuestra-carta}">Carta del día</a></li>
-            <li><a class="dropdown-item" th:href="@{/index#recorrido}">Recorrido</a></li>
-            <li><a class="dropdown-item" th:href="@{/index#promociones}">Promociones</a></li>
+          <li class="nav-item">
+            <a class="nav-link" th:href="@{/index}">Inicio</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" th:href="@{/nosotros}">Nosotros</a>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="true">
+              Nuestra Carta
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" th:href="@{/index#nuestra-carta}">Carta del día</a></li>
+              <li><a class="dropdown-item" th:href="@{/index#recorrido}">Recorrido</a></li>
+              <li><a class="dropdown-item" th:href="@{/index#promociones}">Promociones</a></li>
+            </ul>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" th:href="@{/galeria}">Galería</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" th:href="@{/eventos}">Eventos</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" th:href="@{/noticias}">Noticias</a>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="true">
+              Contacto
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" th:href="@{/index#mas_informacion}">Más información</a></li>
+              <li><a class="dropdown-item" th:href="@{/index#contacto}">Síguenos</a></li>
+            </ul>
+          </li>
+        </ul>
+
+        <!-- Usuario no logueado -->
+        <div th:if="${usuarioLogeado == null}">
+          <button class="btn-tour" id="openLogin">Inicia sesión</button>
+        </div>
+
+        <!-- Usuario logueado -->
+        <div th:if="${usuarioLogeado != null}" class="dropdown">
+          <button class="btn btn-outline-light dropdown-toggle" type="button" id="userMenu"
+                  data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa-solid fa-user me-1"></i>
+            <span th:text="${usuarioLogeado.nombre}">Usuario</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+            <li>
+              <a class="dropdown-item" th:href="@{/perfil}">
+                <i class="fa-solid fa-id-card me-1"></i>Mis Reservas
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item text-danger" th:href="@{/logout}">
+                <i class="fa-solid fa-right-from-bracket me-1"></i>Cerrar sesión
+              </a>
+            </li>
           </ul>
-        </li>
+        </div>
 
-        <li class="nav-item">
-          <a class="nav-link" th:href="@{/galeria}">Galería</a>
-        </li>
-        
-        <li class="nav-item">
-          <a class="nav-link" th:href="@{/eventos}">Eventos</a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" th:href="@{/noticias}">Noticias</a>
-        </li>
-
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="true">Contacto</a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" th:href="@{/index#mas_informacion}">Más información</a></li>
-            <li><a class="dropdown-item" th:href="@{/index#contacto}">Síguenos</a></li>
-          </ul>
-        </li>
-
-
-      </ul>
-      <button class="btn-tour" id="openLogin">Inicia sesión</button>
+      </div>
     </div>
-  </div>
-</nav>
-
+  </nav>
 </div>
+
 </body>
 </html>

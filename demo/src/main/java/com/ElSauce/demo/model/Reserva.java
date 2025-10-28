@@ -3,9 +3,6 @@ package com.ElSauce.demo.model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
-
-import org.hibernate.query.Page;
 
 import com.ElSauce.demo.Enum.EstadoReserva;
 import com.ElSauce.demo.Enum.TipoDocumento;
@@ -31,11 +28,11 @@ public class Reserva {
     private Mesa mesa;
 
     @ManyToOne
-    @JoinColumn(name = "zona_id", nullable = false)
+    @JoinColumn(name = "zona_id")
     private Zona zona;
 
-    @OneToMany(mappedBy = "reserva", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Page> pagos;
+    @OneToOne(mappedBy = "reserva", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Pago pagos;
 
     // Datos del cliente
     @Column(name = "cliente_nombre")
@@ -63,20 +60,6 @@ public class Reserva {
 
     @Column(name = "numero_documento", length = 50)
     private String numeroDocumento;
-
-    @Column(length = 20)
-    private String ruc;
-
-    @Column(name = "razon_social",length = 200)
-    private String razonSocial;
-
-    @Column(name = "direccion_fiscal")
-    private String direccionFiscal;
-
-    @Column(name = "email_facturacion")
-    private String emailFacturacion;
-
-    private String notas;
 
     @Enumerated(EnumType.STRING)
     private EstadoReserva estado = EstadoReserva.PENDIENTE;
@@ -111,10 +94,10 @@ public class Reserva {
     public void setZona(Zona zona) {
         this.zona = zona;
     }
-    public List<Page> getPagos() {
+    public Pago getPagos() {
         return pagos;
     }
-    public void setPagos(List<Page> pagos) {
+    public void setPagos(Pago pagos) {
         this.pagos = pagos;
     }
     public String getClienteNombre() {
@@ -159,12 +142,6 @@ public class Reserva {
     public void setPersonas(Integer personas) {
         this.personas = personas;
     }
-    public String getNotas() {
-        return notas;
-    }
-    public void setNotas(String notas) {
-        this.notas = notas;
-    }
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -189,30 +166,7 @@ public class Reserva {
     public void setNumeroDocumento(String numeroDocumento) {
         this.numeroDocumento = numeroDocumento;
     }
-    public String getRuc() {
-        return ruc;
-    }
-    public void setRuc(String ruc) {
-        this.ruc = ruc;
-    }
-    public String getRazonSocial() {
-        return razonSocial;
-    }
-    public void setRazonSocial(String razonSocial) {
-        this.razonSocial = razonSocial;
-    }
-    public String getDireccionFiscal() {
-        return direccionFiscal;
-    }
-    public void setDireccionFiscal(String direccionFiscal) {
-        this.direccionFiscal = direccionFiscal;
-    }
-    public String getEmailFacturacion() {
-        return emailFacturacion;
-    }
-    public void setEmailFacturacion(String emailFacturacion) {
-        this.emailFacturacion = emailFacturacion;
-    }
+   
     public EstadoReserva getEstado() {
         return estado;
     }

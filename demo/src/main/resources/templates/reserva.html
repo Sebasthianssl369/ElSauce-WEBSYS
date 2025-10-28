@@ -73,7 +73,7 @@
         <div class="zona-carrusel">
           <button class="zona-nav prev">‹</button>
           <div class="zona-slides">
-            <div class="zona-slide" data-zona="Muelle Panorámico">
+            <div class="zona-slide" data-id="1" data-zona="Muelle Panorámico">
               <div class="zona-img-wrapper">
                 <img src="../imgs/muelle.jpg" alt="Muelle Panorámico" />
                 <div class="zona-overlay">
@@ -82,7 +82,7 @@
                 </div>
               </div>
             </div>
-            <div class="zona-slide" data-zona="Mirador Azul">
+            <div class="zona-slide" data-id="2" data-zona="Mirador Azul">
               <div class="zona-img-wrapper">
                 <img src="../imgs/mirador.jpg" alt="Mirador Azul" />
                 <div class="zona-overlay">
@@ -91,7 +91,7 @@
                 </div>
               </div>
             </div>
-            <div class="zona-slide" data-zona="Salón Bosque">
+            <div class="zona-slide" data-id="3" data-zona="Salón Bosque">
               <div class="zona-img-wrapper">
                 <img src="../imgs/salon.jpg" alt="Salón Bosque" />
                 <div class="zona-overlay">
@@ -115,62 +115,38 @@
 
         <!-- Resumen rápido de la reserva -->
         <div class="resumen-reserva" id="resumen-reserva"></div>
-
+    <form th:action="@{/reserva}" method="post" th:object="${reserva}">
+            <input type="hidden" th:field="*{personas}" id="inputPersonas" />
+            <input type="hidden" th:field="*{fechaReserva}" id="inputFecha" />
+            <input type="hidden" th:field="*{horaReserva}" id="inputHora" />
+            <input type="hidden" name="zonaId" id="inputZona" th:value="${zonaSeleccionadaId}" />
+  
         <!-- Datos personales -->
-         <form id="form-datos" novalidate>
         <div class="datos-personales">
           <label
             >Nombre
-            <input type="text" id="nombre" required />
+            <input type="text" id="nombre" th:field="*{clienteNombre}" required />
           </label>
           <label
             >Apellidos
-            <input type="text" id="apellidos" required />
+            <input type="text" id="apellidos" th:field="*{clienteApellidos}" required />
           </label>
           <label
             >Email
-            <input type="email" id="email" required />
+            <input type="email" id="email" th:field="*{clienteEmail}" required />
           </label>
           <label
             >Teléfono
-            <input type="tel" id="telefono" placeholder="+51 ..." required />
+            <input type="text" id="telefono" th:field="*{clienteTelefono}" placeholder="+51 ..." required />
           </label>
         </div>
 
         <!-- Tipo de comprobante -->
         <div class="comprobante">
-          <label>Tipo de documento</label>
-          <select id="tipo-comprobante">
-            <option value="">Selecciona…</option>
-            <option value="boleta">Boleta (DNI/Pasaporte)</option>
-            <option value="factura">Factura (RUC/RUT)</option>
-          </select>
+          <label>Boleta (DNI)
+            <input type="text" id="doc-boleta" th:field="*{numeroDocumento}" />
+          </label>
 
-          <div id="factura-campos" class="extra-campos hidden">
-            <label
-              >Número de RUC o RUT
-              <input type="text" id="ruc" />
-            </label>
-            <label
-              >Nombre o razón social
-              <input type="text" id="razon" />
-            </label>
-            <label
-              >Dirección fiscal
-              <input type="text" id="direccion-fiscal" />
-            </label>
-            <label
-              >Email de facturación
-              <input type="email" id="email-factura" />
-            </label>
-          </div>
-
-          <div id="boleta-campos" class="extra-campos hidden">
-            <label
-              >Número de documento
-              <input type="text" id="doc-boleta" />
-            </label>
-          </div>
         </div>
 
         <!-- Casillas de aceptación -->
@@ -186,11 +162,10 @@
         </div>
 
         <div class="acciones">
-          <button type="button" class="btn-anterior">Atrás</button>
-          <button type="submit" id="btn-continuar">Continuar</button>
+          <button class="btn-anterior">Atrás</button>
+          <button class="btn-siguiente">Siguiente</button>
         </div>
       </section>
-    </form>
 
       <!-- Paso 6: Información de tarjeta -->
       <section class="reserva-step" data-step="6">
@@ -198,7 +173,6 @@
         <p>No estás realizando ningún pago en este momento…</p>
 
         <!-- campos de tarjeta -->
-         <form id="form-pago">
         <label
           >Nombre del titular <input type="text" id="nombre-tarjeta" required
         /></label>
@@ -206,15 +180,15 @@
           >Número de tarjeta <input type="text" id="numero-tarjeta" required
         /></label>
         <label>CVV/CV2 <input type="text" id="cvv" required/></label>
-        </form>
 
         <!-- Resumen final -->
         <div id="resumen-final"></div>
 
         <div class="acciones">
           <button class="btn-anterior">Atrás</button>
-          <button id="btn-confirmar">Finalizar Reserva</button>
+          <button type="submit" id="btn-confirmar">Finalizar Reserva</button>
         </div>
+          </form>
       </section>
 
       <!-- 👇 Aquí cierras el main -->

@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="Fragmentos/fragmentos :: head"></head>
+<head th:replace="~{Fragmentos/fragmentos :: head}"></head>
 <body>
 
-<div th:replace="Fragmentos/fragmentos :: reserva"></div>
-<div th:replace="Fragmentos/fragmentos :: login_cli"></div>
+<div th:replace="~{Fragmentos/fragmentos :: reserva}"></div>
+<div th:replace="~{Fragmentos/fragmentos :: login_cli}"></div>
 <!--Cabecera-->
-<div th:replace="Fragmentos/fragmentos :: header"></div>
-
-<div th:replace="Fragmentos/fragmentos :: alertas"></div>
+<div th:replace="~{Fragmentos/fragmentos :: header}"></div>
 
 <!--section-->
 <section class="carrusel" id="inicio">
