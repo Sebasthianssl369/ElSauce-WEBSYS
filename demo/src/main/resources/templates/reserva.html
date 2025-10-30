@@ -1,203 +1,227 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Reserva - El Sauce</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserva tu Mesa - El Sauce</title>
+    <link rel="stylesheet" th:href="@{css/reserva.css}">
+    <link rel="stylesheet" th:href="@{css/styles.css}">
+    <style>
+        :root {
+            --color-fd-blanco: #ffffff;
+            --color-grisnosc: #333333;
+            --spacing-xs: 0.5rem;   /* 8px */
+            --spacing-sm: 1rem;     /* 16px */
+            --spacing-md: 1.5rem;   /* 24px */
+            --spacing-lg: 2.5rem;   /* 40px */
+            --color-turquesa: #1abc9c;
+            --color-verdeazulado: #16a085;
+            --color-gris: #95a5a6;
+            --color-arena: #f5f5dc; /* Arena */
+            --text-xs: 0.8rem;
+            --text-sm: 1rem;
+            --text-lg: 1.5rem;
+        }
+    </style>
+</head>
+<body>
 
-    <!-- Estilos globales -->
-    <link rel="stylesheet" th:href="@{/css/styles.css}" />
-    <!-- Estilos específicos de reservas -->
-    <link rel="stylesheet" th:href="@{/css/reserva.css}" />
-  </head>
-  <body>
+<div class="reserva-container">
     <header class="reserva-header">
-      <h1>Reserva tu Mesa</h1>
-      <p>Sigue los pasos para completar tu reserva.</p>
+        <h1>Sistema de Reservas</h1>
     </header>
 
-    <!-- Línea de progreso -->
     <div class="timeline">
-      <div class="step active" data-step="1">Personas</div>
-      <div class="step" data-step="2">Fecha</div>
-      <div class="step" data-step="3">Hora</div>
-      <div class="step" data-step="4">Zona</div>
-      <div class="step" data-step="5">Datos</div>
-      <div class="step" data-step="6">Pago</div>
+        <div class="step active">1. Personas</div>
+        <div class="step">2. Fecha</div>
+        <div class="step">3. Hora</div>
+        <div class="step">4. Zona</div>
+        <div class="step">5. Datos</div>
+        <div class="step">6. Pago</div>
     </div>
 
-    <!-- Contenedor de pasos -->
-    <main class="reserva-container">
-      <!-- Paso 1: Personas -->
-      <section class="reserva-step active" data-step="1">
-        <h2>¿Cuántas personas asistirán?</h2>
-        <input type="number" id="personas" min="1" max="8" value="2" />
-        <p class="nota">
-          Máximo 8 personas. Para más de 8, comunícate al
-          <strong>+51 987 654 321</strong>.
-        </p>
+    <div class="reserva-step active" data-step="1">
+        <h2>1. ¿Cuántas personas son?</h2>
+        <label for="personas">Número de Comensales (Min: 2, Max: 8):</label>
+        <input type="number" id="personas" name="personas" value="2" min="2" max="8" required>
+        <p class="nota">Para grupos más grandes, por favor llame a nuestro restaurante.</p>
         <div class="acciones">
-          <button class="btn-siguiente">Siguiente</button>
+            <button type="button" class="btn-siguiente">Siguiente</button>
         </div>
-      </section>
+    </div>
 
-      <!-- Paso 2: Fecha -->
-      <section class="reserva-step" data-step="2">
-        <h2>Selecciona la fecha</h2>
+    <div class="reserva-step" data-step="2">
+        <h2>2. Selecciona la fecha</h2>
         <div class="calendar-wrapper">
-          <button class="cal-nav prev">&laquo;</button>
-          <div id="calendar-container">
-            <!-- JS inyecta aquí el mes actual -->
-          </div>
-          <button class="cal-nav next">&raquo;</button>
+            <button class="cal-nav prev">«</button>
+            <div id="calendar-container">
+                </div>
+            <button class="cal-nav next">»</button>
         </div>
-        <div class="acciones">
-          <button class="btn-anterior">Atrás</button>
-          <button class="btn-siguiente">Siguiente</button>
-        </div>
-      </section>
+        
+        <input type="hidden" id="inputFecha" name="fecha_seleccionada" required>
 
-      <!-- Paso 3: Hora -->
-      <section class="reserva-step" data-step="3">
-        <h2>Selecciona la hora</h2>
-        <div id="hora-grid" class="hora-grid"></div>
         <div class="acciones">
-          <button class="btn-anterior">Atrás</button>
-          <button class="btn-siguiente">Siguiente</button>
+            <button type="button" class="btn-anterior">Anterior</button>
+            <button type="button" class="btn-siguiente">Siguiente</button>
         </div>
-      </section>
+    </div>
 
-      <!-- Paso 4: Zona -->
-      <section class="reserva-step" data-step="4">
-        <h2>Elige tu zona preferida</h2>
+    <div class="reserva-step" data-step="3">
+        <h2>3. Selecciona la hora</h2>
+        <p class="nota">Horarios disponibles según la capacidad y el día.</p>
+        
+        <div id="hora-grid" class="hora-grid">
+            </div>
+        
+        <input type="hidden" id="inputHora" name="hora_seleccionada" required>
+        
+        <div class="acciones">
+            <button type="button" class="btn-anterior">Anterior</button>
+            <button type="button" class="btn-siguiente">Siguiente</button>
+        </div>
+    </div>
+
+    <div class="reserva-step" data-step="4">
+        <h2>4. Elige la zona de tu mesa</h2>
+        
         <div class="zona-carrusel">
-          <button class="zona-nav prev">‹</button>
-          <div class="zona-slides">
-            <div class="zona-slide" data-id="1" data-zona="Muelle Panorámico">
-              <div class="zona-img-wrapper">
-                <img src="../imgs/muelle.jpg" alt="Muelle Panorámico" />
-                <div class="zona-overlay">
-                  <h3>Muelle Panorámico</h3>
-                  <p>Brisa del lago y pasarela de madera.</p>
+            <div class="zona-slides">
+                <div class="zona-slide" data-id="1" data-zona="Terraza con Vistas">
+                    <div class="zona-img-wrapper">
+                        <img src="https://via.placeholder.com/800x400/1abc9c/FFFFFF?text=TERRAZA" alt="Terraza con vistas">
+                        <div class="zona-overlay">
+                            <h3>Terraza con Vistas</h3>
+                            <p>Disfruta de la mejor vista de la ciudad. Ideal para atardeceres.</p>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </div>
-            <div class="zona-slide" data-id="2" data-zona="Mirador Azul">
-              <div class="zona-img-wrapper">
-                <img src="../imgs/mirador.jpg" alt="Mirador Azul" />
-                <div class="zona-overlay">
-                  <h3>Mirador Azul</h3>
-                  <p>Vista abierta a la Laguna Azul.</p>
+                <div class="zona-slide" data-id="2" data-zona="Salón Principal">
+                    <div class="zona-img-wrapper">
+                        <img src="https://via.placeholder.com/800x400/3498db/FFFFFF?text=SALON" alt="Salón Principal">
+                        <div class="zona-overlay">
+                            <h3>Salón Principal</h3>
+                            <p>Ambiente elegante y acogedor, cerca de la cocina.</p>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </div>
-            <div class="zona-slide" data-id="3" data-zona="Salón Bosque">
-              <div class="zona-img-wrapper">
-                <img src="../imgs/salon.jpg" alt="Salón Bosque" />
-                <div class="zona-overlay">
-                  <h3>Salón Bosque</h3>
-                  <p>Ambiente cálido y rodeado de plantas.</p>
+                <div class="zona-slide" data-id="3" data-zona="Reservado Privado">
+                    <div class="zona-img-wrapper">
+                        <img src="https://via.placeholder.com/800x400/9b59b6/FFFFFF?text=PRIVADO" alt="Reservado Privado">
+                        <div class="zona-overlay">
+                            <h3>Reservado Privado</h3>
+                            <p>Espacio discreto para reuniones o cenas íntimas.</p>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
-          <button class="zona-nav next">›</button>
-        </div>
-        <div class="acciones">
-          <button class="btn-anterior">Atrás</button>
-          <button class="btn-siguiente">Siguiente</button>
-        </div>
-      </section>
-
-      <!-- Paso 5: Datos del cliente -->
-      <section class="reserva-step" data-step="5">
-        <h2>Completa tus datos</h2>
-
-        <!-- Resumen rápido de la reserva -->
-        <div class="resumen-reserva" id="resumen-reserva"></div>
-    <form th:action="@{/reserva}" method="post" th:object="${reserva}">
-            <input type="hidden" th:field="*{personas}" id="inputPersonas" />
-            <input type="hidden" th:field="*{fechaReserva}" id="inputFecha" />
-            <input type="hidden" th:field="*{horaReserva}" id="inputHora" />
-            <input type="hidden" name="zonaId" id="inputZona" th:value="${zonaSeleccionadaId}" />
-  
-        <!-- Datos personales -->
-        <div class="datos-personales">
-          <label
-            >Nombre
-            <input type="text" id="nombre" th:field="*{clienteNombre}" required />
-          </label>
-          <label
-            >Apellidos
-            <input type="text" id="apellidos" th:field="*{clienteApellidos}" required />
-          </label>
-          <label
-            >Email
-            <input type="email" id="email" th:field="*{clienteEmail}" required />
-          </label>
-          <label
-            >Teléfono
-            <input type="text" id="telefono" th:field="*{clienteTelefono}" placeholder="+51 ..." required />
-          </label>
+            <button class="zona-nav prev">‹</button>
+            <button class="zona-nav next">›</button>
         </div>
 
-        <!-- Tipo de comprobante -->
-        <div class="comprobante">
-          <label>Boleta (DNI)
-            <input type="text" id="doc-boleta" th:field="*{numeroDocumento}" />
-          </label>
-
-        </div>
-
-        <!-- Casillas de aceptación -->
-        <div class="aceptacion">
-          <label>
-            <input type="checkbox" id="acepto-terminos" required />
-            Acepto los términos, condiciones y políticas de privacidad.
-          </label>
-          <label>
-            <input type="checkbox" id="acepto-comunicaciones" />
-            Consiento recibir comunicaciones del restaurante por e-mail y/o SMS.
-          </label>
-        </div>
+        <input type="hidden" id="inputZona" name="zona_seleccionada" required>
 
         <div class="acciones">
-          <button class="btn-anterior">Atrás</button>
-          <button class="btn-siguiente">Siguiente</button>
+            <button type="button" class="btn-anterior">Anterior</button>
+            <button type="button" class="btn-siguiente">Siguiente</button>
         </div>
-      </section>
+    </div>
 
-      <!-- Paso 6: Información de tarjeta -->
-      <section class="reserva-step" data-step="6">
-        <h2>Ingresa la información de tu tarjeta</h2>
-        <p>No estás realizando ningún pago en este momento…</p>
+    <div class="reserva-step" data-step="5">
+        <h2>5. Datos del cliente</h2>
+        
+        <form id="form-datos">
+            <div class="datos-personales">
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" required>
 
-        <!-- campos de tarjeta -->
-        <label
-          >Nombre del titular <input type="text" id="nombre-tarjeta" required
-        /></label>
-        <label
-          >Número de tarjeta <input type="text" id="numero-tarjeta" required
-        /></label>
-        <label>CVV/CV2 <input type="text" id="cvv" required/></label>
+                <label for="apellidos">Apellidos:</label>
+                <input type="text" id="apellidos" name="apellidos" required>
 
-        <!-- Resumen final -->
-        <div id="resumen-final"></div>
+                <label for="email">Email (@gmail.com):</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="telefono">Teléfono:</label>
+                <input type="tel" id="telefono" name="telefono" required>
+                
+                <label for="dni">Número de DNI:</label>
+                <input type="text" id="dni" name="dni" required>
+            </div>
+
+            <hr style="margin: 20px 0;">
+
+            <div class="comprobante">
+                <label for="tipo-comprobante">Tipo de Comprobante:</label>
+                <select id="tipo-comprobante" name="tipo_comprobante">
+                    <option value="boleta">Boleta (Consumidor Final)</option>
+                    <option value="factura">Factura (Empresa)</option>
+                </select>
+                
+                <div id="factura-campos" class="extra-campos hidden">
+                    <label for="ruc">RUC:</label>
+                    <input type="text" id="ruc" name="ruc">
+                    <label for="razon-social">Razón Social:</label>
+                    <input type="text" id="razon-social" name="razon_social">
+                </div>
+                <div id="boleta-campos" class="extra-campos">
+                    </div>
+            </div>
+
+            <div class="aceptacion">
+                <label>
+                    <input type="checkbox" id="acepto-terminos" required> 
+                    Acepto los términos y condiciones y la política de privacidad.
+                </label>
+            </div>
+        </form>
+
+        <div class="resumen-reserva" id="resumen-reserva">
+            <h3>Tu Reserva</h3>
+            <p>Datos de la reserva...</p>
+        </div>
+        
+        <div class="acciones">
+            <button type="button" class="btn-anterior">Anterior</button>
+            <button type="button" id="btn-validar-datos" class="btn-siguiente">Ir a Pago (Paso 6)</button>
+        </div>
+    </div>
+
+    <div class="reserva-step" data-step="6">
+        <h2>6. Información de Tarjeta y Confirmación</h2>
+
+        <div id="resumen-final">
+            </div>
+        
+        <form id="form-pago">
+            <label for="nombre-tarjeta">Nombre en la Tarjeta:</label>
+            <input type="text" id="nombre-tarjeta" name="nombre_tarjeta" required placeholder="Ej: JUAN PEREZ">
+            
+            <label for="numero-tarjeta">Número de Tarjeta:</label>
+            <input type="text" id="numero-tarjeta" name="numero_tarjeta" required placeholder="XXXX XXXX XXXX XXXX">
+            
+            <div style="display: flex; gap: 10px;">
+                <label style="flex: 2;">Fecha Exp. (MM/AA):
+                    <input type="text" id="exp-fecha" name="exp_fecha" required placeholder="MM/AA">
+                </label>
+                <label style="flex: 1;">CVV:
+                    <input type="text" id="cvv" name="cvv" required placeholder="***">
+                </label>
+            </div>
+        </form>
 
         <div class="acciones">
-          <button class="btn-anterior">Atrás</button>
-
-          <button type="button" id="btn-validar-datos" class="btn-siguiente-custom">
-            Siguiente
-          </button>
+            <button type="button" class="btn-anterior">Anterior</button>
+            <button type="button" id="btn-confirmar">Confirmar Reserva y Pagar</button>
         </div>
+    </div>
 
-          </form>
-      </section>
+    <footer class="reserva-footer">
+        <p>&copy; 2024 El Sauce. <a href="#">Aviso Legal</a></p>
+    </footer>
 
-      <!-- 👇 Aquí cierras el main -->
-    </main>
+</div>
 
-    <script th:src="@{/scripts/reserva.js}"></script>
-  </body>
+<script th:src="@{scripts/scripts.js}"></script>
+
+</body>
 </html>
