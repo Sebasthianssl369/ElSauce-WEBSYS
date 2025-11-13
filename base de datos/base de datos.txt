@@ -1,0 +1,207 @@
+-- ===============================
+-- Base de datos El Sauce (modelo actualizado al proyecto Spring Boot)
+-- ===============================
+DROP DATABASE IF EXISTS elsauce_db;
+CREATE DATABASE IF NOT EXISTS elsauce_db
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+USE elsauce_db;
+
+-- =====================================
+-- TABLA: roles
+-- =====================================
+CREATE TABLE roles (
+  id INT UNSIGNED PRIMARY KEY,
+  nombre VARCHAR(50) NOT NULL UNIQUE,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- =====================================
+-- TABLA: users
+-- =====================================
+CREATE TABLE users (
+  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(100),
+  apellido VARCHAR(100),
+  email VARCHAR(150) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  telefono VARCHAR(20),
+  tipo_documento ENUM('DNI','RUC','BOLETA','FACTURA') DEFAULT 'DNI',
+  numero_documento VARCHAR(50),
+  razon_social VARCHAR(200),
+  direccion_fiscal VARCHAR(255),
+  email_facturacion VARCHAR(150),
+  is_active BOOLEAN DEFAULT TRUE,
+  role_id INT UNSIGNED NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_users_roles FOREIGN KEY (role_id)
+    REFERENCES roles(id)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+-- =====================================
+-- TABLA: zonas
+-- =====================================
+CREATE TABLE zonas (
+  id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(100) NOT NULL UNIQUE,
+  descripcion VARCHAR(255),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- =====================================
+-- TABLA: horarios_prefijados
+-- =====================================
+CREATE TABLE horarios_prefijados (
+  id SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  hora TIME NOT NULL UNIQUE,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- =====================================
+-- TABLA: mesas
+-- =====================================
+CREATE TABLE mesas (
+  id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  numero VARCHAR(20) NOT NULL UNIQUE,
+  capacidad TINYINT UNSIGNED NOT NULL CHECK (capacidad BETWEEN 1 AND 8),
+  zona_id INT UNSIGNED NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_mesas_zona FOREIGN KEY (zona_id)
+    REFERENCES zonas(id)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+-- =====================================
+-- TABLA: platos
+-- =====================================
+CREATE TABLE platos (
+  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(150) NOT NULL,
+  precio DECIMAL(8,2) NOT NULL CHECK (precio >= 0),
+  descripcion TEXT,
+  imagen_ruta VARCHAR(300),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_platos_nombre (nombre)
+) ENGINE=InnoDB;
+
+-- =====================================
+-- TABLA: reservas
+-- =====================================
+CREATE TABLE reservas (
+  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  user_id BIGINT UNSIGNED NULL,
+  mesa_id INT UNSIGNED NULL,
+  zona_id INT UNSIGNED NULL,
+  cliente_nombre VARCHAR(150),
+  cliente_apellidos VARCHAR(150),
+  cliente_email VARCHAR(150),
+  cliente_telefono VARCHAR(20),
+  fecha_reserva DATE NOT NULL,
+  hora_reserva TIME NOT NULL,
+  personas TINYINT UNSIGNED NOT NULL CHECK (personas BETWEEN 1 AND 8),
+  tipo ENUM('BOLETA','FACTURA') DEFAULT 'BOLETA',
+  numero_documento VARCHAR(50),
+  estado ENUM('PENDIENTE','CONFIRMADA','CANCELADA','ASISTIO') DEFAULT 'PENDIENTE',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_reservas_user FOREIGN KEY (user_id)
+    REFERENCES users(id)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE,
+  CONSTRAINT fk_reservas_mesa FOREIGN KEY (mesa_id)
+    REFERENCES mesas(id)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE,
+  CONSTRAINT fk_reservas_zona FOREIGN KEY (zona_id)
+    REFERENCES zonas(id)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE,
+  INDEX idx_reservas_fecha (fecha_reserva, hora_reserva)
+) ENGINE=InnoDB;
+
+-- =====================================
+-- TABLA: pagos
+-- =====================================
+CREATE TABLE pagos (
+  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  reserva_id BIGINT UNSIGNED NOT NULL UNIQUE,
+  monto DECIMAL(8,2) NOT NULL CHECK (monto >= 0),
+  fecha_transaccion DATETIME,
+  metodo_pago VARCHAR(100),
+  estado_pago ENUM('PAID','PENDING','FAILED','REFUNDED') DEFAULT 'PAID',
+  id_transaccion VARCHAR(100),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_pagos_reserva FOREIGN KEY (reserva_id)
+    REFERENCES reservas(id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+-- =====================================
+-- DATOS INICIALES
+-- =====================================
+
+-- Roles
+INSERT INTO roles (id, nombre) VALUES
+  (1, 'ADMIN'),
+  (2, 'USER');
+
+-- Usuarios de prueba
+INSERT INTO users (nombre, apellido, email, password_hash, telefono, role_id, is_active)
+VALUES
+ ('Fabian',   'Espinoza', 'fabian@example.com',   SHA2('utp', 256), '900000001', 1, TRUE),
+ ('Milagros', 'Perez',    'milagros@example.com', SHA2('utp', 256), '900000002', 1, TRUE),
+ ('Alonso',   'Garcia',   'alonso@example.com',   SHA2('utp', 256), '900000003', 1, TRUE),
+ ('Diego',    'Lopez',    'diego@example.com',    SHA2('utp', 256), '900000004', 1, TRUE);
+
+-- Zonas
+INSERT INTO zonas (nombre, descripcion) VALUES
+ ('Muelle Panorámico', 'Brisa del lago y pasarela de madera.'),
+ ('Mirador Azul',       'Vista abierta a la Laguna Azul.'),
+ ('Salón Bosque',       'Ambiente cálido y rodeado de plantas.');
+
+-- Horarios
+INSERT INTO horarios_prefijados (hora) VALUES
+ ('12:00:00'),('12:15:00'),('12:30:00'),('12:45:00'),
+ ('13:00:00'),('13:15:00'),('13:30:00'),('13:45:00'),
+ ('14:00:00'),('14:15:00'),('14:30:00'),('14:45:00'),
+ ('15:00:00'),('15:15:00'),('15:30:00'),('15:45:00'),
+ ('16:00:00'),('16:15:00'),('16:30:00'),('16:45:00'),
+ ('17:00:00'),('17:15:00'),('17:30:00'),('17:45:00'),
+ ('18:00:00'),('18:15:00'),('18:30:00'),('18:45:00'),
+ ('19:00:00'),('19:15:00'),('19:30:00'),('19:45:00'),
+ ('20:00:00'),('20:15:00'),('20:30:00'),('20:45:00'),
+ ('21:00:00'),('21:15:00'),('21:30:00'),('21:45:00'),
+ ('22:00:00');
+
+-- Mesas
+INSERT INTO mesas (numero, zona_id, capacidad) VALUES
+ ('M1', 1, 2), ('M2', 1, 4),
+ ('M3', 2, 2), ('M4', 2, 4),
+ ('M5', 3, 2), ('M6', 3, 4);
+
+-- Platos
+INSERT INTO platos (nombre, precio, descripcion, imagen_ruta)
+VALUES ('Trucha a la parrilla', 38.50, 'Trucha fresca con hierbas y limón.', '/uploads/platos/trucha_parrilla.jpg');
+
+-- Reserva de ejemplo
+SET @zona_bosque_id = (SELECT id FROM zonas WHERE nombre = 'Salón Bosque' LIMIT 1);
+INSERT INTO reservas
+  (user_id, cliente_nombre, cliente_apellidos, cliente_email, cliente_telefono,
+   fecha_reserva, hora_reserva, personas, mesa_id, zona_id, tipo, estado)
+VALUES
+  (NULL, 'Fabian', 'Espinoza', 'fabian.espinoza@example.com', '900000001',
+   '2025-10-30', '19:15:00', 2, NULL, @zona_bosque_id, 'BOLETA', 'PENDIENTE');
+   select*from reservas
+   

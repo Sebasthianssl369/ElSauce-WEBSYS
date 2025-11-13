@@ -1,6 +1,3 @@
-/* ======================================================
-   reserva.js - Wizard completo con pasos 1 a 6
-   ====================================================== */
 document.addEventListener("DOMContentLoaded", () => {
   // ----------------------------
   // 1) ELEMENTOS Y ESTADO GLOBAL
@@ -10,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnSiguientes = Array.from(document.querySelectorAll(".btn-siguiente"));
   const btnAnteriores = Array.from(document.querySelectorAll(".btn-anterior"));
 
-  const reservaData = { personas: 2, fecha: null, hora: null, zona: null };
+  const reservaData = { personas: 2, fecha: null, hora: null, zona: null, monto: 0 };
 
   let selectedDate = null;
   let selectedCell = null;
@@ -19,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let selectedZona = null;
 
   const resumenDiv = document.getElementById("resumen-reserva");
+  const resumenFinal = document.getElementById("resumen-final");
 
   // ----------------------------
   // 2) FUNCIONES DE NAVEGACIÓN
@@ -30,51 +28,40 @@ document.addEventListener("DOMContentLoaded", () => {
   function showStep(index) {
     steps.forEach((s, i) => s.classList.toggle("active", i === index));
     timelineSteps.forEach((t, i) => t.classList.toggle("active", i <= index));
-    actualizarResumen(); // Actualiza resumen en paso 5
+    actualizarResumen();
   }
 
   btnSiguientes.forEach(btn => btn.addEventListener("click", () => {
-  const current = getActiveStepIndex();
+    const current = getActiveStepIndex();
 
-  // ⚡ VALIDACIÓN SOLO EN EL PRIMER PASO (Personas)
-  if (current === 0) {
-    const personas = parseInt(reservaData.personas);
-
-    if (personas < 2) {
-      alert("❌ ERROR: El mínimo es 2 personas. Ingrese nuevamente por favor.");
-      return; // 🔒 No avanza
+    if (current === 0) {
+      const personas = parseInt(reservaData.personas);
+      if (personas < 2) {
+        alert("❌ ERROR: El mínimo es 2 personas. Ingrese nuevamente por favor.");
+        return;
+      }
+      if (personas > 8) {
+        alert("⚠️ Nuestro personal se comunicará con usted apenas envíe la reservación.");
+      }
     }
 
-    if (personas > 8) {
-      alert("⚠️ Nuestro personal se comunicará con usted apenas envíe la reservación.");
-      // ✅ Luego sí avanza al siguiente paso
-    }
-  }
-
-  if (current === 1) {
-    if (!reservaData.fecha) {
+    if (current === 1 && !reservaData.fecha) {
       alert("📅 Por favor, seleccione una fecha antes de continuar.");
-      return; // 🔒 No avanza
+      return;
     }
-  }
 
-  if (current === 2) {
-    if (!reservaData.hora) {
+    if (current === 2 && !reservaData.hora) {
       alert("⚠️ Por favor, seleccione un horario antes de continuar.");
-      return; // 🔒 No avanza
+      return;
     }
-  }
 
-  if (current === 3) {
-    if (!reservaData.zona) {
+    if (current === 3 && !reservaData.zona) {
       alert("📍 Por favor, seleccione una zona antes de continuar.");
       return;
     }
-  }
 
-  // 👇 Navegación normal (solo si pasó validación)
-  if (current < steps.length - 1) showStep(current + 1);
-}));
+    if (current < steps.length - 1) showStep(current + 1);
+  }));
 
   btnAnteriores.forEach(btn => btn.addEventListener("click", () => {
     const current = getActiveStepIndex();
@@ -87,9 +74,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const inputPersonas = document.getElementById("personas");
   if (inputPersonas) {
     inputPersonas.addEventListener("input", () => {
-      reservaData.personas = inputPersonas.value;
+      reservaData.personas = parseInt(inputPersonas.value) || 0;
+      actualizarResumen();
     });
-    reservaData.personas = inputPersonas.value;
+    reservaData.personas = parseInt(inputPersonas.value) || 0;
   }
 
   // ----------------------------
@@ -218,7 +206,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const zonaId = slide.dataset.id;
         const zonaNombre = slide.dataset.zona;
         selectedZona = { id: zonaId, nombre: zonaNombre };
-        reservaData.zona = selectedZona; 
+        reservaData.zona = selectedZona;
         document.getElementById("inputZona").value = zonaId;
         actualizarResumen();
       });
@@ -226,134 +214,30 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ----------------------------
-  // 7) PASO 5: Datos del cliente + resumen
+  // 7) PASO 5 Y 6: Datos + Confirmación
   // ----------------------------
-  // ----------------------------
-// 7) PASO 5: Datos del cliente + resumen
-// ----------------------------
-const formDatos = document.getElementById("form-datos");
-const btnContinuar = document.getElementById("btn-continuar");
-const emailInput = document.getElementById("email");
-const telefonoInput = document.getElementById("telefono");
-const tipoComprobante = document.getElementById("tipo-comprobante");
-const boletaCampos = document.getElementById("boleta-campos");
-const facturaCampos = document.getElementById("factura-campos");
-
-if (emailInput) {
-  emailInput.addEventListener("input", () => {
-    const value = emailInput.value.trim();
-
-    if (!value.endsWith("@gmail.com") && value !== "") {
-      emailInput.setCustomValidity("Solo se permiten correos @gmail.com");
-    } else {
-      emailInput.setCustomValidity("");
-    }
-  });
-}
-
-if (telefonoInput) {
-  // Colocar el prefijo inicial al cargar
-  telefonoInput.value = "+51 ";
-
-  telefonoInput.addEventListener("focus", () => {
-    if (!telefonoInput.value.startsWith("+51")) {
-      telefonoInput.value = "+51 ";
-    }
-  });
-
-  telefonoInput.addEventListener("input", () => {
-    // Evitar que borre o modifique el prefijo
-    if (!telefonoInput.value.startsWith("+51")) {
-      telefonoInput.value = "+51 " + telefonoInput.value.replace(/[^0-9]/g, "");
-    }
-
-    // Quitar caracteres no numéricos después del prefijo
-    const soloNumeros = telefonoInput.value
-      .replace("+51", "")
-      .replace(/\D/g, "");
-
-    // Limitar a 9 dígitos después del +51
-    if (soloNumeros.length > 9) {
-      telefonoInput.value = "+51 " + soloNumeros.slice(0, 9);
-    }
-  });
-
-  telefonoInput.addEventListener("blur", () => {
-    // Mostrar aviso nativo si no hay 9 dígitos
-    const soloNumeros = telefonoInput.value.replace("+51", "").replace(/\D/g, "");
-    if (soloNumeros.length !== 9) {
-      telefonoInput.setCustomValidity("El número debe tener 9 dígitos");
-    } else {
-      telefonoInput.setCustomValidity("");
-    }
-  });
-}
-
-if (tipoComprobante) {
-  tipoComprobante.addEventListener("change", () => {
-    const tipo = tipoComprobante.value;
-
-    if (tipo === "boleta") {
-      boletaCampos.classList.remove("hidden");
-      facturaCampos.classList.add("hidden");
-    } else if (tipo === "factura") {
-      facturaCampos.classList.remove("hidden");
-      boletaCampos.classList.add("hidden");
-    } else {
-      // si elige "Selecciona…"
-      facturaCampos.classList.add("hidden");
-      boletaCampos.classList.add("hidden");
-    }
-  });
-}
-
-if (formDatos) {
-  formDatos.addEventListener("submit", (e) => {
-    e.preventDefault(); // no recarga la página
-
-    // Validación automática del navegador
-    if (!formDatos.checkValidity()) {
-      formDatos.reportValidity(); // muestra mensajes "Por favor complete este campo"
-      return; // 🔒 no avanza
-    }
-
-    // Si todo es válido, guarda los datos en el objeto reservaData
-    reservaData.nombre = document.getElementById("nombre").value.trim();
-    reservaData.apellidos = document.getElementById("apellidos").value.trim();
-    reservaData.email = document.getElementById("email").value.trim();
-    reservaData.telefono = document.getElementById("telefono").value.trim();
-    reservaData.comprobante = document.getElementById("tipo-comprobante").value;
-
-    
-    // Verifica la casilla de privacidad por si acaso
-    const privacidad = document.getElementById("acepto-terminos");
-    if (!privacidad.checked) {
-      alert("🔒 Debes aceptar los términos y condiciones para continuar.");
-      return;
-    }
-
-    // ✅ Avanza al paso 6
-    const idxPaso6 = steps.findIndex((s) => s.dataset.step === "6");
-    if (idxPaso6 !== -1) showStep(idxPaso6);
-  });
-}
-
-
-  // ----------------------------
-  // 8) PASO 6: Confirmar tarjeta + resumen final
-  // ----------------------------
-  const btnConfirmar = document.getElementById("btn-confirmar");
-  const resumenFinal = document.getElementById("resumen-final");
-
   function actualizarResumen() {
+    let monto = 0;
+    if (reservaData.zona && reservaData.personas) {
+      switch (reservaData.zona.nombre) {
+        case "Muelle Panorámico": monto = reservaData.personas * 8.00; break;
+        case "Mirador Azul": monto = reservaData.personas * 9.00; break;
+        case "Salón Bosque": monto = reservaData.personas * 10.00; break;
+        default: monto = reservaData.personas * 7.00; break;
+      }
+    }
+    reservaData.monto = monto;
+
     if (resumenDiv) {
       resumenDiv.innerHTML = `
         <p><strong>Personas:</strong> ${reservaData.personas || ""}</p>
         <p><strong>Fecha:</strong> ${reservaData.fecha ? reservaData.fecha.toLocaleDateString() : ""}</p>
         <p><strong>Hora:</strong> ${reservaData.hora || ""}</p>
-        <p><strong>Zona:</strong> ${reservaData.zona.nombre || ""}</p>
+        <p><strong>Zona:</strong> ${reservaData.zona?.nombre || ""}</p>
+        <p><strong>Monto a pagar:</strong> S/ ${monto.toFixed(2)}</p>
       `;
     }
+
     if (resumenFinal) {
       resumenFinal.innerHTML = `
         <h3>Resumen de la reserva</h3>
@@ -363,61 +247,42 @@ if (formDatos) {
         <p><strong>Personas:</strong> ${reservaData.personas || ""}</p>
         <p><strong>Fecha:</strong> ${reservaData.fecha ? reservaData.fecha.toLocaleDateString() : ""}</p>
         <p><strong>Hora:</strong> ${reservaData.hora || ""}</p>
-        <p><strong>Zona:</strong> ${reservaData.zona.nombre || ""}</p>
+        <p><strong>Zona:</strong> ${reservaData.zona?.nombre || ""}</p>
+        <p><strong>Monto a pagar:</strong> S/ ${monto.toFixed(2)}</p>
       `;
     }
   }
 
+  // ----------------------------
+  // 8) Confirmar Pago
+  // ----------------------------
+  const btnConfirmar = document.getElementById("btn-confirmar");
   if (btnConfirmar) {
-  btnConfirmar.addEventListener("click", (e) => {
-    e.preventDefault();
+    btnConfirmar.addEventListener("click", (e) => {
+      e.preventDefault();
 
-    // Campos de tarjeta
-    const nombreTarjeta = document.getElementById("nombre-tarjeta");
-    const numeroTarjeta = document.getElementById("numero-tarjeta");
-    const cvv = document.getElementById("cvv");
+      const nombreTarjeta = document.getElementById("nombre-tarjeta");
+      const numeroTarjeta = document.getElementById("numero-tarjeta");
+      const cvv = document.getElementById("cvv");
 
-    // Validaciones básicas
-    numeroTarjeta.setCustomValidity("");
-    cvv.setCustomValidity("");
+      if (!nombreTarjeta.value || !numeroTarjeta.value || !cvv.value) {
+        alert("Por favor, completa todos los datos de la tarjeta.");
+        return;
+      }
 
-    if (!nombreTarjeta.value || !numeroTarjeta.value || !cvv.value) {
-      alert("Por favor, completa todos los datos de la tarjeta.");
-      return;
-    }
+      if (numeroTarjeta.value.length < 12 || numeroTarjeta.value.length > 19) {
+        alert("El número de tarjeta debe tener entre 12 y 19 dígitos.");
+        return;
+      }
 
-    if (numeroTarjeta.value.length < 12 || numeroTarjeta.value.length > 19) {
-      numeroTarjeta.setCustomValidity("El número de tarjeta debe tener entre 12 y 19 dígitos.");
-      numeroTarjeta.reportValidity();
-      return;
-    }
+      if (cvv.value.length < 3 || cvv.value.length > 4) {
+        alert("El CVV debe tener 3 o 4 dígitos.");
+        return;
+      }
 
-    if (cvv.value.length < 3 || cvv.value.length > 4) {
-      cvv.setCustomValidity("El CVV debe tener 3 o 4 dígitos.");
-      cvv.reportValidity();
-      return;
-    }
-
-    // ✅ Crear el objeto reserva en el formato que el dashboard espera
-    const newRes = {
-      id: Date.now() + Math.floor(Math.random() * 10000),
-      name: `${reservaData.nombre} ${reservaData.apellidos}`,
-      date: reservaData.fecha ? reservaData.fecha.toLocaleDateString() : "",
-      time: reservaData.hora || "",
-      people: Number(reservaData.personas) || 0,
-      notes: `Zona: ${reservaData.zona || "No especificada"}`,
-    };
-
-    // Guardar en localStorage
-    const reservas = JSON.parse(localStorage.getItem("reservas")) || [];
-    reservas.push(newRes);
-    localStorage.setItem("reservas", JSON.stringify(reservas));
-
-    // ✅ Redirigir al index
-    alert("✅ ¡Reserva confirmada! Serás redirigido al inicio.");
-    window.location.href = "/";
-  });
-}
+      alert(`✅ ¡Reserva confirmada! Monto pagado: S/ ${reservaData.monto.toFixed(2)}\nSerás redirigido al inicio.`);
+      window.location.href = "/";
+    });
+  }
 
 });
-

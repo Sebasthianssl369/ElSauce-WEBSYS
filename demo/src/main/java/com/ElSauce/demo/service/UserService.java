@@ -29,7 +29,7 @@ public class UserService {
             throw new RuntimeException("El email ya está registrado");
         }
 
-        Role role = roleRepository.findById((short) 2)
+        Role role = roleRepository.findById(2L)
                 .orElseThrow(() -> new RuntimeException("Rol con id 2 no encontrado"));
 
         user.setRole(role);
@@ -44,9 +44,6 @@ public class UserService {
      public User login(String email, String password) {
     User user = userRepository.findByEmail(email);
     if (user != null && passwordEncoder.matches(password, user.getPasswordHash())) {
-         if (user.getRole() != null) {
-            user.getRole().getId(); // esto inicializa el proxy (no carga todo el objeto)
-        }
         return user;
     }
     return null;

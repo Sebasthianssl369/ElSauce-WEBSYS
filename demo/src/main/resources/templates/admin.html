@@ -9,7 +9,14 @@
 <body>
   <div class="login-container">
     <h2>Acceso Administrador</h2>
-      <form action="/dashboard" method="post">
+      <div th:if="${error}" class="alert error-message">
+            <p>❌ <span th:text="${error}"></span></p>
+        </div>
+
+        <div th:if="${mensaje}" class="alert success-message">
+            <p>✅ <span th:text="${mensaje}"></span></p>
+        </div>
+      <form  id="formAdmin" th:action="@{/admin}" method="post">
           <label for="email">Correo:</label>
           <input type="text" id="email" name="email" required>
 
@@ -20,8 +27,6 @@
       </form>    
     <div id="loginMessage"></div>
   </div>
-
-  <script th:src="@{scripts/login.js}"></script>
 </body>
 </html>
 

@@ -72,13 +72,13 @@ public class UserController {
     ) {
         User user = userService.login(email, password);
 
-        if (user != null && user.getRole().getId() == 2) {
+        if (user != null && user.getRole().getId() == 2L) {
             session.setAttribute("usuarioLogeado", user);
             redirectAttributes.addFlashAttribute("mensaje", "Inicio de sesión exitoso. ¡Bienvenido!");
             return "redirect:/"; // o tu página de reservas
         } else {
             redirectAttributes.addFlashAttribute("error", "Correo o contraseña incorrectos.");
-            return "redirect:/";
+            return "redirect:/login";
         }
     }
 

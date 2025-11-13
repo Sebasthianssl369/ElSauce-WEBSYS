@@ -6,8 +6,6 @@ import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -62,7 +60,7 @@ public class ReservaController {
 public String postMethodName(@ModelAttribute Reserva reserva,
                              @RequestParam("fechaReserva") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaReserva,
                              @RequestParam("horaReserva") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime horaReservaStr, 
-                             @RequestParam("zonaId") Integer zonaId,
+                             @RequestParam("zonaId") Integer zonaId,@RequestParam(value = "redirect", required = false, defaultValue = "index") String redirectTarget,
                              HttpSession session) {
 
     LocalDateTime horaActual = LocalDateTime.now();
@@ -134,7 +132,13 @@ public String postMethodName(@ModelAttribute Reserva reserva,
     pagoService.guardarPago(pago);
     
     System.out.println("Reserva y Pago exitosos. Zona: " + reserva.getZona().getNombre());
-    return "index";
+    if ("dashboard-reservas".equalsIgnoreCase(redirectTarget)) {
+            // Si viene del dashboard, redirige a /reserva para recargar la lista
+            return "redirect:/dashboard-reservas";
+        } else {
+            // Por defecto, o si viene de reserva.html, redirige a /index
+            return "redirect:/index"; 
+        }
 }
     
 }
