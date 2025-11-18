@@ -10,8 +10,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.ElSauce.demo.Enum.EstadoReserva;
+
 import com.ElSauce.demo.model.Mesa;
 import com.ElSauce.demo.model.Reserva;
+
 
 public interface ReservaRepository extends JpaRepository<Reserva,Long>{
     List<Reserva> findByFechaReserva(LocalDate fechaReserva);
@@ -20,6 +22,19 @@ public interface ReservaRepository extends JpaRepository<Reserva,Long>{
     List<Reserva> findByHoraReserva(LocalTime horaReserva);
     boolean existsByMesaAndFechaReservaAndHoraReservaAndEstadoIn(Mesa mesa, LocalDate fecha, LocalTime hora, List<EstadoReserva> estados);
 
-    List<LocalTime> findHorasOcupadas(LocalDate fechaReserva, Integer zona, Integer mesa);
+
+    @Query("""
+        SELECT r.horaReserva
+        FROM Reserva r
+        WHERE r.fechaReserva = :fecha
+        AND r.zona.id = :zonaId
+        AND r.mesa.id = :mesaId
+        AND r.estado IN ('PENDIENTE', 'ASISTIO')
+    """)
+    List<LocalTime> findHorasOcupadas(
+            @Param("fecha") LocalDate fechaReserva,
+            @Param("zonaId") Integer zonaId,
+            @Param("mesaId") Long mesaId
+    );
 
 }

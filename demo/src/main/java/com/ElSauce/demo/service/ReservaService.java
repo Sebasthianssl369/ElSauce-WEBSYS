@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.ElSauce.demo.Enum.EstadoReserva;
 import com.ElSauce.demo.model.Mesa;
 import com.ElSauce.demo.model.Reserva;
+import com.ElSauce.demo.model.Zona;
 import com.ElSauce.demo.repository.HorarioPrefijadoRepository;
 import com.ElSauce.demo.repository.MesaRepository;
 import com.ElSauce.demo.repository.ReservaRepository;
@@ -99,8 +100,9 @@ public class ReservaService {
     List<String> todosHorarios = horarioPrefijadoRepository.findAllHoras(); // asume List<String> "HH:mm:ss"
 
     // horarios ocupados desde ReservaRepository --> List<LocalTime>
-    List<LocalTime> horariosOcupados = reservaRepository.findHorasOcupadas(fechaReserva, zona, mesa);
-
+    List<LocalTime> horariosOcupados(LocalDate fecha, Zona zona, Mesa mesa){
+         reservaRepository.findHorasOcupadas(fechaReserva, zona.getId(), mesa.getId());
+    }    
     // convertir ocupados a formato "HH:mm:ss" para comparar con todosHorarios
     Set<String> ocupadosStr = horariosOcupados.stream()
         .map(t -> t.toString()) // LocalTime.toString() => "HH:mm[:ss]" (ej "13:30" o "13:30:00")
