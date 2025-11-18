@@ -24,4 +24,14 @@ public class MesaService {
     public void eliminarMesa(Integer id) {
         mesaRepository.deleteById(id);
     }
+
+    public int obtenerMesaSegunPersonas(int personas) {
+
+        if (personas <= 2) return 1;  // mesa 2
+        if (personas <= 4) return 2;  // mesa 4
+        if (personas <= 6) return 3;  // mesa 6
+        if (personas <= 8) return 4;  // mesa 8
+
+        return -1; // no disponible
+    }
 }

@@ -30,19 +30,33 @@
     <header class="reserva-header">
         <h1>Sistema de Reservas</h1>
     </header>
+    
+    <div class="alert-container">
+
+    <!-- Éxito -->
+    <div th:if="${success}" class="alert alert-success">
+        <span th:text="${success}"></span>
+    </div>
+
+    <!-- Error -->
+    <div th:if="${error}" class="alert alert-danger">
+        <span th:text="${error}"></span>
+    </div>
+
+    </div>
 
     <div class="timeline">
         <div class="step active">1. Personas</div>
         <div class="step">2. Fecha</div>
-        <div class="step">3. Hora</div>
-        <div class="step">4. Zona</div>
+        <div class="step">3. Zona</div>
+        <div class="step">4. Hora</div>
         <div class="step">5. Datos</div>
         <div class="step">6. Pago</div>
     </div>
 
     <div class="reserva-step active" data-step="1">
         <h2>1. ¿Cuántas personas son?</h2>
-        <label for="personas">Número de Comensales (Min: 2, Max: 8):</label>
+        <label for="personas">Número de Personas (Min: 2, Max: 8):</label>
         <input type="number" id="personas" name="personas" value="2" min="2" max="8" required>
         <p class="nota">Para grupos más grandes, por favor llame a nuestro restaurante.</p>
         <div class="acciones">
@@ -66,24 +80,8 @@
             <button type="button" class="btn-siguiente">Siguiente</button>
         </div>
     </div>
-
     <div class="reserva-step" data-step="3">
-        <h2>3. Selecciona la hora</h2>
-        <p class="nota">Horarios disponibles según la capacidad y el día.</p>
-        
-        <div id="hora-grid" class="hora-grid">
-            </div>
-        
-        <input type="hidden" id="inputHora" name="hora_seleccionada" required>
-        
-        <div class="acciones">
-            <button type="button" class="btn-anterior">Anterior</button>
-            <button type="button" class="btn-siguiente">Siguiente</button>
-        </div>
-    </div>
-
-    <div class="reserva-step" data-step="4">
-        <h2>4. Elige la zona de tu mesa</h2>
+        <h2>3. Elige la zona de tu mesa</h2>
         
         <div class="zona-carrusel">
             <div class="zona-slides">
@@ -126,7 +124,22 @@
             <button type="button" class="btn-siguiente">Siguiente</button>
         </div>
     </div>
+    <div class="reserva-step" data-step="4">
+        <h2>4. Selecciona la hora</h2>
+        <p class="nota">Horarios disponibles según la capacidad y el día.</p>
+        
+        <div id="hora-grid" class="hora-grid">
+            </div>
+        
+        <input type="hidden" id="inputHora" name="hora_seleccionada" required>
+        
+        <div class="acciones">
+            <button type="button" class="btn-anterior">Anterior</button>
+            <button type="button" class="btn-siguiente">Siguiente</button>
+        </div>
+    </div>
 
+    
     <div class="reserva-step" data-step="5">
         <h2>5. Datos del cliente</h2>
         
@@ -189,7 +202,7 @@
     <div class="reserva-step" data-step="6">
         <h2>6. Información de Tarjeta y Confirmación</h2>
 
-        <div id="resumen-final">
+        <div id="resumen-final" class="resumen-final">
             
             </div>
         

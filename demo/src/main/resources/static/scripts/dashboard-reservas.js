@@ -54,12 +54,14 @@ if (applyFilters) {
     const fPeopleVal = (filterPeople.value || '').toString().trim();
     const fPeople = fPeopleVal === '' ? null : Number(fPeopleVal);
     const fName = (filterName.value || '').trim().toLowerCase();
+    const fTime = filterTime.value;
 
     const filtradas = reservas.filter(r => {
       const matchDate = fDateVal ? r.date === fDateVal : true;
       const matchPeople = (fPeople === null) ? true : (Number(r.people) === fPeople);
       const matchName = fName ? r.name.toLowerCase().includes(fName) : true;
-      return matchDate && matchPeople && matchName;
+      const matchTime = fTime ? (r.time.startsWith(fTime)) : true;
+      return matchDate && matchPeople && matchName && matchTime;
     });
 
     renderReservas(filtradas);
@@ -72,6 +74,7 @@ if (clearFilters) {
     filterDate.value = '';
     filterPeople.value = '';
     filterName.value = '';
+    filterTime.value = '';
     renderReservas(reservas);
   });
 }
@@ -102,6 +105,22 @@ function renderReservas(lista) {
     // ...
   });
 }
+
+function loadFilterTimes() {
+    const selectFiltro = document.getElementById("filterTime");
+    if (!selectFiltro) return;
+
+    horariosDisponibles.forEach(hora => {
+        const op = document.createElement("option");
+        op.value = hora;
+        op.textContent = hora;
+        selectFiltro.appendChild(op);
+    });
+}
+
+loadFilterTimes();
+
+
 
 // pequeña utilidad para evitar inyección de HTML en los campos
 function escapeHtml(text) {

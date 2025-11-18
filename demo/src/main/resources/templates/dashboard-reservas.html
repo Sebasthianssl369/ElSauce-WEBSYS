@@ -76,8 +76,9 @@
 
                 <div class="col-md-2">
                     <label for="filterTime" class="form-label">Hora</label>
-                    <input type="time" class="form-control" id="filterTime" name="filterTime"
-                           th:value="${currentFilterTime}">
+                    <select class="form-control" id="filterTime" name="filterTime">
+                      <option value="">Seleccione una hora</option>
+                    </select>
                 </div>
                 
                 <div class="col-md-2">
@@ -120,8 +121,15 @@
                 <td th:text="${#temporals.format(reserva.fechaReserva, 'dd/MM/yyyy')}">15/11/2025</td>
                 <td th:text="${reserva.horaReserva}">19:30</td>
                 <td th:text="${reserva.personas}">4</td>
+                <td>
+                  <span th:if="${reserva.mesa != null}" th:text="${reserva.mesa.numero}">M100</span>
+                  <span th:unless="${reserva.mesa != null}">—</span>
+                </td>
 
-                <td th:text="${reserva.zona.nombre}">Muelle Panorámico</td> 
+                <td>
+                  <span th:if="${reserva.zona != null}" th:text="${reserva.zona.nombre}">Muelle Panorámico Z</span>
+                  <span th:unless="${reserva.mesa != null}">—</span>
+                </td> 
                 <td>
                     <form th:action="@{/dashboard-reservas/eliminar}" method="post" style="display:inline;">
                         <input type="hidden" name="id" th:value="${reserva.id}" />

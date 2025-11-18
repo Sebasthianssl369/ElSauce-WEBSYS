@@ -6,6 +6,8 @@ import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -13,11 +15,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
 import com.ElSauce.demo.Enum.EstadoPago;
+import com.ElSauce.demo.Enum.EstadoReserva;
 import com.ElSauce.demo.model.Mesa;
 import com.ElSauce.demo.model.Pago;
 import com.ElSauce.demo.model.Reserva;
 import com.ElSauce.demo.model.User;
 import com.ElSauce.demo.model.Zona;
+import com.ElSauce.demo.service.MesaService;
 import com.ElSauce.demo.service.PagoService;
 import com.ElSauce.demo.service.ReservaService;
 import com.ElSauce.demo.service.ZonaService;
@@ -28,6 +32,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class ReservaController {
@@ -40,6 +46,9 @@ public class ReservaController {
 
     @Autowired
     private ZonaService zonaService;
+
+    @Autowired
+    private MesaService mesaService;
 
     @GetMapping("/reserva")
     public String paginaReserva(Model model, HttpSession session) {
@@ -60,8 +69,9 @@ public class ReservaController {
 public String postMethodName(@ModelAttribute Reserva reserva,
                              @RequestParam("fechaReserva") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaReserva,
                              @RequestParam("horaReserva") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime horaReservaStr, 
-                             @RequestParam("zonaId") Integer zonaId,@RequestParam(value = "redirect", required = false, defaultValue = "index") String redirectTarget,
-                             HttpSession session) {
+                             @RequestParam("zona") Integer zonaId,@RequestParam(value = "redirect", required = false, defaultValue = "index") String redirectTarget,
+                             HttpSession session,
+                             RedirectAttributes redirectAttr) {
 
     LocalDateTime horaActual = LocalDateTime.now();
     
@@ -77,12 +87,10 @@ public String postMethodName(@ModelAttribute Reserva reserva,
     Zona zona = zonaService.buscarZonaPorID(zonaId)
            .orElseThrow(() -> new RuntimeException("Zona no encontrada"));
     
-    Mesa mesa = new Mesa(); 
-    mesa.setId(1); // Usamos Long para el ID de Mesa
+
     
     // 2. ASIGNACIÓN DE DATOS A LA RESERVA
     reserva.setUser(user);
-    reserva.setMesa(mesa); 
     reserva.setZona(zona);
     reserva.setFechaReserva(fechaReserva); 
     reserva.setHoraReserva(horaReservaStr); 
@@ -109,9 +117,18 @@ public String postMethodName(@ModelAttribute Reserva reserva,
             break;
     }
 
+    Optional<Mesa> mesaOpt = reservaService.asignarMesaParaReserva(zona.getId(), reserva.getPersonas(), fechaReserva, horaReservaStr);
+    if (mesaOpt.isEmpty()) {
+        redirectAttr.addFlashAttribute("error", 
+                "No hay mesas disponibles para esa zona, fecha y hora. Intenta cambiar el horario.");
+        return "redirect:/reserva";
+    }
+    reserva.setMesa(mesaOpt.get());
     // 4. GUARDAR LA RESERVA EN LA BD
-    Reserva reservaGuardada = reservaService.guardarReserva(reserva);
     
+    Reserva reservaGuardada = reservaService.guardarReserva(reserva);
+    redirectAttr.addFlashAttribute("success", 
+        "Reserva creada con éxito. Procede con los siguientes pasos.");
     // 5. CREAR Y GUARDAR EL PAGO (CORRECCIÓN DE ORDEN)
     Pago pago = new Pago();
     
@@ -139,6 +156,16 @@ public String postMethodName(@ModelAttribute Reserva reserva,
             // Por defecto, o si viene de reserva.html, redirige a /index
             return "redirect:/index"; 
         }
-}
+    }
     
+    @GetMapping("/api/horarios/disponibles")
+    @ResponseBody
+    public List<String> obtenerHorariosDisponibles(
+        @RequestParam int personas,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaReserva,
+        @RequestParam("zona") int zona
+    ) {
+    int mesa = mesaService.obtenerMesaSegunPersonas(personas);
+    return reservaService.obtenerHorariosDisponibles(fechaReserva, zona, mesa);
+}
 }

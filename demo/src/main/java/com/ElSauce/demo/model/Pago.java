@@ -91,6 +91,7 @@ public class Pago {
     public void setIdTransaccion(String idTransaccion) {
         this.idTransaccion = idTransaccion;
     }
+
     
     
 }

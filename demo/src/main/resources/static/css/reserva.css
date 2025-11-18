@@ -422,4 +422,27 @@ body {
 .reserva-step[data-step="6"] .acciones button.btn-anterior:hover {
   background-color: #bbb;
 }
+.alert-container {
+    margin: 15px auto;
+    width: 90%;
+    max-width: 700px;
+}
 
+.alert {
+    padding: 12px 18px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border-left: 5px solid #28a745;
+}
+
+.alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+    border-left: 5px solid #dc3545;
+}

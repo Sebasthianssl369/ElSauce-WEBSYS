@@ -1,5 +1,5 @@
 /* ======================================================
-    reserva.js - Wizard completo con pasos 1 a 6
+    reserva.js - Wizard completo con pasos 1 a 6 (con monto)
     ====================================================== */
 document.addEventListener("DOMContentLoaded", () => {
     // ----------------------------
@@ -17,7 +17,8 @@ document.addEventListener("DOMContentLoaded", () => {
         apellidos: null,
         email: null,
         telefono: null,
-        numeroDocumento: null 
+        numeroDocumento: null,
+        monto: 0.00
     };
 
     let selectedDate = null;
@@ -26,6 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let selectedZona = null;
 
     const resumenDiv = document.getElementById("resumen-reserva");
+    const resumenFinal = document.getElementById("resumen-final");
 
     // ----------------------------
     // 2) FUNCIONES DE NAVEGACIÓN
@@ -46,7 +48,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (index >= 4) actualizarResumen(); 
     }
 
-    // Listener de navegación general (Siguiente/Anterior)
     document.addEventListener("click", (e) => {
         const btnAnterior = e.target.closest(".btn-anterior");
         const btnSiguiente = e.target.closest(".btn-siguiente");
@@ -59,39 +60,37 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // Si es un botón "Siguiente" que NO es el del Paso 5 (btn-validar-datos)
         if (btnSiguiente && btnSiguiente.id !== 'btn-validar-datos') {
             e.preventDefault();
             
-            // --- VALIDACIONES POR PASO ---
             let canAdvance = true;
 
-            if (current === 0) { // Paso 1: Personas
+            if (current === 0) { 
                 const personas = parseInt(reservaData.personas);
-                if (personas < 2) {
-                    alert("❌ ERROR: El mínimo es 2 personas. Ingrese nuevamente por favor.");
-                    canAdvance = false;
-                } else if (personas > 8) {
-                    alert("⚠️ Nuestro personal se comunicará con usted para reservas grandes.");
-                }
-            } else if (current === 1) { // Paso 2: Fecha
+                if (isNaN(personas) || personas < 2) {
+                    alert("❌ ERROR: El mínimo es 2 personas.");
+                    canAdvance = false;
+                } else if (personas > 8) { // Validamos que el límite no se haya excedido
+                    alert(`⛔ No se permiten reservas de más de 8 personas.`);
+                    canAdvance = false; // ¡IMPORTANTE! Impedimos el avance
+                }
+            } else if (current === 1) { 
                 if (!reservaData.fecha) {
-                    alert("📅 Por favor, seleccione una fecha antes de continuar.");
+                    alert("📅 Seleccione una fecha.");
                     canAdvance = false;
                 }
-            } else if (current === 2) { // Paso 3: Hora
-                if (!reservaData.hora) {
-                    alert("⚠️ Por favor, seleccione un horario antes de continuar.");
-                    canAdvance = false;
-                }
-            } else if (current === 3) { // Paso 4: Zona
+            } else if (current === 2) { 
                 if (!reservaData.zona) {
-                    alert("📍 Por favor, seleccione una zona antes de continuar.");
+                    alert("📍 Seleccione una zona.");
+                    canAdvance = false;
+                }
+            } else if (current === 3) { 
+                if (!reservaData.hora) {
+                    alert("⚠️ Seleccione un horario.");
                     canAdvance = false;
                 }
             }
 
-            // Navegación normal (solo si pasó validación)
             if (canAdvance && current < steps.length - 1) {
                 showStep(current + 1);
             }
@@ -101,13 +100,43 @@ document.addEventListener("DOMContentLoaded", () => {
     // ----------------------------
     // 3) PASO 1: Personas
     // ----------------------------
-    const inputPersonas = document.getElementById("personas");
-    if (inputPersonas) {
-        inputPersonas.addEventListener("input", () => {
-            reservaData.personas = inputPersonas.value;
-        });
-        reservaData.personas = inputPersonas.value;
+    const MAX_PERSONAS = 8; // Define el máximo aquí para fácil referencia
+
+const inputPersonas = document.getElementById("personas");
+if (inputPersonas) {
+    inputPersonas.addEventListener("input", () => {
+        let valorActual = parseInt(inputPersonas.value);
+        
+        // 1. Manejar la restricción máxima
+        if (valorActual > MAX_PERSONAS) {
+            alert(`⛔ La reserva máxima permitida para este formulario es de ${MAX_PERSONAS} personas. Si necesita más, contáctenos.`);
+            // Restablece el valor en el campo de entrada a 8
+            inputPersonas.value = MAX_PERSONAS;
+            valorActual = MAX_PERSONAS;
+        }
+
+        // 2. Manejar la restricción mínima (opcional, si el input no lo hace)
+        if (valorActual < 2) {
+             inputPersonas.value = 2;
+             valorActual = 2;
+        }
+
+        // 3. Guardar el valor válido
+        reservaData.personas = valorActual;
+        actualizarResumen();
+    });
+    
+    // Inicialización del dato al cargar
+    // Asegura que el valor inicial también respete el límite
+    let initialValue = parseInt(inputPersonas.value);
+    if (isNaN(initialValue) || initialValue < 2) {
+        initialValue = 2;
+    } else if (initialValue > MAX_PERSONAS) {
+        initialValue = MAX_PERSONAS;
     }
+    inputPersonas.value = initialValue;
+    reservaData.personas = initialValue;
+}
 
     // ----------------------------
     // 4) PASO 2: Calendario
@@ -209,16 +238,62 @@ document.addEventListener("DOMContentLoaded", () => {
             renderCalendar(currentMonth, currentYear);
         });
 
-        // --- LLAMADA INICIAL ---
         renderCalendar(currentMonth, currentYear);
     }
+
+    // ----------------------------
+    // 6) PASO 4: Zona
+    // ----------------------------
+
+const slides = Array.from(document.querySelectorAll(".zona-slide"));
+const slidesContainer = document.querySelector(".zona-slides");
+const prevZona = document.querySelector(".zona-nav.prev");
+const nextZona = document.querySelector(".zona-nav.next");
+
+const url = `/api/horarios/disponibles?fecha=${fechaISO}&zonaId=${zonaId}&personas=${personas}`;
+
+if (slides.length && slidesContainer && prevZona && nextZona) {
+    let currentZonaIndex = 0;
+
+    function updateZonaPosition() {
+        slidesContainer.style.transform = `translateX(-${currentZonaIndex * 100}%)`;
+    }
+
+    prevZona.addEventListener("click", () => {
+        currentZonaIndex = (currentZonaIndex - 1 + slides.length) % slides.length;
+        updateZonaPosition();
+    });
+
+    nextZona.addEventListener("click", () => {
+        currentZonaIndex = (currentZonaIndex + 1) % slides.length;
+        updateZonaPosition();
+    });
+
+    slides.forEach(slide => {
+        slide.addEventListener("click", () => {
+            slides.forEach(s => s.classList.remove("selected"));
+            slide.classList.add("selected");
+
+            const zonaId = slide.dataset.id;
+            const zonaNombre = slide.dataset.zona;
+
+            selectedZona = { id: zonaId, nombre: zonaNombre };
+            reservaData.zona = selectedZona;
+            document.getElementById("inputZona").value = zonaId;
+
+            actualizarResumen();
+
+            // ⬇️ MOVIDO AQUÍ (correcto)
+            setTimeout(cargarHorariosDisponibles, 50);
+        });
+    });
+}
 
     // ----------------------------
     // 5) PASO 3: Hora (CARGA DINÁMICA DE BD)
     // ----------------------------
     const horaGrid = document.getElementById("hora-grid");
 
-    // Función para renderizar y hacer clic en las horas
     function renderHorarios(horarios) {
         if (!horaGrid) return;
         horaGrid.innerHTML = ''; // Limpia el grid existente
@@ -241,7 +316,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 cell.classList.add("selected");
                 selectedHourCell = cell;
                 
-                // CORRECCIÓN: Guarda la hora en formato 24h para el backend (HH:mm)
+                // Guarda la hora en formato 24h para el backend (HH:mm)
                 const hora24hFormato = cell.getAttribute('data-hora-24h');
                 reservaData.hora = hora24hFormato; 
                 document.getElementById("inputHora").value = hora24hFormato;
@@ -251,7 +326,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Función principal para obtener los datos de la API
     async function fetchHorarios() {
         if (!horaGrid) return;
 
@@ -264,44 +338,59 @@ document.addEventListener("DOMContentLoaded", () => {
             renderHorarios(data);
         } catch (error) {
             console.error('Fallo en fetchHorarios. Usando horarios estáticos de respaldo.', error);
-            // Horarios estáticos de respaldo si la API falla:
             const horariosRespaldo = ["12:00:00", "13:30:00", "15:00:00", "19:00:00", "20:30:00", "21:00:00"];
             renderHorarios(horariosRespaldo); 
         }
     }
 
-    // Iniciar la carga de horarios si estamos en ese paso
     if (horaGrid) {
         fetchHorarios();
     }
 
-    // ----------------------------
-    // 6) PASO 4: Zona
-    // ----------------------------
-    const slides = Array.from(document.querySelectorAll(".zona-slide"));
-    const slidesContainer = document.querySelector(".zona-slides");
-    const prevZona = document.querySelector(".zona-nav.prev");
-    const nextZona = document.querySelector(".zona-nav.next");
-    if (slides.length && slidesContainer && prevZona && nextZona) {
-        let currentZonaIndex = 0;
-        function updateZonaPosition() { 
-            if (slidesContainer) slidesContainer.style.transform = `translateX(-${currentZonaIndex * 100}%)`; 
-        }
-        prevZona.addEventListener("click", () => { currentZonaIndex = (currentZonaIndex - 1 + slides.length) % slides.length; updateZonaPosition(); });
-        nextZona.addEventListener("click", () => { currentZonaIndex = (currentZonaIndex + 1) % slides.length; updateZonaPosition(); });
-        slides.forEach(slide => {
-            slide.addEventListener("click", () => {
-                slides.forEach(s => s.classList.remove("selected"));
-                slide.classList.add("selected");
-                const zonaId = slide.dataset.id;
-                const zonaNombre = slide.dataset.zona;
-                selectedZona = { id: zonaId, nombre: zonaNombre };
-                reservaData.zona = selectedZona; 
-                document.getElementById("inputZona").value = zonaId;
-                actualizarResumen();
-            });
-        });
+    async function cargarHorariosDisponibles() {
+    if (!reservaData.fecha || !reservaData.zona) return;
+
+    const fechaISO = reservaData.fecha.toISOString().split("T")[0];
+    const zonaId = reservaData.zona.id;
+    const personas = reservaData.personas;
+
+    try {
+        const url =
+            `/api/horarios/disponibles?fecha=${fechaISO}&zonaId=${zonaId}&personas=${personas}`;
+
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("No se pudo cargar horarios disponibles");
+
+        const horariosDisponibles = await response.json(); // Ej: ["12:00:00","13:00:00"]
+
+        // Renderizar solo horarios disponibles
+        renderHorarios(horariosDisponibles);
+
+    } catch (err) {
+        console.error("Error filtrando horarios:", err);
     }
+}
+
+// Cuando cambie PERSONAS → recalcular horarios
+if (inputPersonas) {
+    inputPersonas.addEventListener("change", () => {
+        cargarHorariosDisponibles();
+    });
+}
+
+// Cuando se seleccione FECHA → recalcular horarios
+document.addEventListener("click", (e) => {
+    if (e.target.classList.contains("day")) {
+        setTimeout(cargarHorariosDisponibles, 50);
+    }
+});
+
+// Cuando se seleccione ZONA → recalcular horarios
+slides.forEach(slide => {
+    slide.addEventListener("click", () => {
+        setTimeout(cargarHorariosDisponibles, 50);
+    });
+});
 
     // ----------------------------
     // 7) PASO 5: Datos del cliente + resumen
@@ -315,8 +404,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const boletaCampos = document.getElementById("boleta-campos");
     const facturaCampos = document.getElementById("factura-campos");
 
-    // Lógica de validación de formulario (se mantiene)
-    // ...
     if (emailInput) {
         emailInput.addEventListener("input", () => {
             const value = emailInput.value.trim();
@@ -328,20 +415,42 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Lógica del input de Teléfono (se mantiene)
+    // ----------------------------
+    // DNI – SOLO NÚMEROS (8 dígitos exactos)
+    // ----------------------------
+    if (dniInput) {
+        dniInput.addEventListener("input", () => {
+            dniInput.value = dniInput.value.replace(/\D/g, "").slice(0, 8);
+        });
+
+        dniInput.addEventListener("blur", () => {
+            if (dniInput.value.length !== 8) {
+                dniInput.setCustomValidity("El DNI debe tener 8 dígitos");
+            } else {
+                dniInput.setCustomValidity("");
+            }
+        });
+    }
+
+    // ----------------------------
+    // Teléfono – +51 + 9 dígitos exactos
+    // ----------------------------
     if (telefonoInput) {
         telefonoInput.value = "+51 ";
+
         telefonoInput.addEventListener("focus", () => {
-            if (!telefonoInput.value.startsWith("+51")) {
+            if (!telefonoInput.value.startsWith("+51 ")) {
                 telefonoInput.value = "+51 ";
             }
         });
 
         telefonoInput.addEventListener("input", () => {
-            if (!telefonoInput.value.startsWith("+51")) {
-                telefonoInput.value = "+51 " + telefonoInput.value.replace(/[^0-9]/g, "");
+            if (!telefonoInput.value.startsWith("+51 ")) {
+                telefonoInput.value = "+51 " + telefonoInput.value.replace(/\D/g, "");
             }
+
             const soloNumeros = telefonoInput.value.replace("+51", "").replace(/\D/g, "");
+
             if (soloNumeros.length > 9) {
                 telefonoInput.value = "+51 " + soloNumeros.slice(0, 9);
             }
@@ -356,8 +465,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-    
-    // Lógica para mostrar/ocultar campos de Factura/Boleta (se mantiene)
+
     if (tipoComprobante) {
         tipoComprobante.addEventListener("change", () => {
             const tipo = tipoComprobante.value;
@@ -366,8 +474,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-
-    // Listener para el botón 'Siguiente' del Paso 5 (Validación de Datos)
     if (btnValidarDatos) {
         btnValidarDatos.addEventListener("click", (e) => {
             e.preventDefault(); 
@@ -399,13 +505,79 @@ document.addEventListener("DOMContentLoaded", () => {
     // ----------------------------
     // 8) PASO 6: Confirmar tarjeta + resumen final (LÓGICA DE ENVÍO AL BACKEND)
     // ----------------------------
-    const btnFinalizarReserva = document.getElementById("btn-confirmar"); 
-    const resumenFinal = document.getElementById("resumen-final");
+    const btnFinalizarReserva = document.getElementById("btn-confirmar");
 
+    // TARJETA – restricciones (número, cvv, expiración)
+    const numeroTarjeta = document.getElementById("numero-tarjeta");
+    const cvv = document.getElementById("cvv");
+    const fechaExp = document.getElementById("exp-fecha");
+    const nombreTarjeta = document.getElementById("nombre-tarjeta");
+
+    if (numeroTarjeta) {
+        numeroTarjeta.addEventListener("input", () => {
+            numeroTarjeta.value = numeroTarjeta.value.replace(/\D/g, "").slice(0, 16);
+        });
+    }
+    if (cvv) {
+        cvv.addEventListener("input", () => {
+            cvv.value = cvv.value.replace(/\D/g, "").slice(0, 4);
+        });
+    }
+    if (fechaExp) {
+        fechaExp.addEventListener("input", () => {
+            fechaExp.value = fechaExp.value.replace(/[^\d\/]/g, "");
+            if (fechaExp.value.length === 2 && !fechaExp.value.includes("/")) fechaExp.value = fechaExp.value + "/";
+        });
+        fechaExp.addEventListener("blur", () => {
+            const val = fechaExp.value;
+            if (!/^\d{2}\/\d{2}$/.test(val)) {
+                fechaExp.setCustomValidity("Formato inválido (MM/YY)");
+                return;
+            }
+            const [mm, yy] = val.split("/").map(Number);
+            if (mm < 1 || mm > 12) {
+                fechaExp.setCustomValidity("Mes inválido");
+                return;
+            }
+            const now = new Date();
+            const currentYear = now.getFullYear() % 100;
+            const currentMonth = now.getMonth() + 1;
+            if (yy < currentYear || (yy === currentYear && mm < currentMonth)) {
+                fechaExp.setCustomValidity("La tarjeta está vencida");
+                return;
+            }
+            fechaExp.setCustomValidity("");
+        });
+    }
+
+    // ----------------------------
+    // CÁLCULO DE MONTO (MISMA LÓGICA QUE BACKEND)
+    // ----------------------------
+    function calcularMonto() {
+        const personasNum = Number(reservaData.personas) || 0;
+        let precioUnit = 7.00; // default
+
+        const zonaNombre = reservaData.zona && reservaData.zona.nombre ? reservaData.zona.nombre : "";
+        switch (zonaNombre) {
+            case "Muelle Panorámico": precioUnit = 8.00; break;
+            case "Mirador Azul": precioUnit = 9.00; break;
+            case "Salón Bosque": precioUnit = 10.00; break;
+            default: precioUnit = 7.00; break;
+        }
+
+        const monto = personasNum * precioUnit;
+        reservaData.monto = Number(monto.toFixed(2));
+        return reservaData.monto;
+    }
+
+    // ----------------------------
+    // ACTUALIZAR RESUMEN (ahora incluye monto)
+    // ----------------------------
     function actualizarResumen() {
         const fechaStr = reservaData.fecha ? reservaData.fecha.toLocaleDateString() : "No elegida";
-        const horaDisplay = reservaData.hora || "No elegida"; // Muestra la hora 24h o AM/PM según tu preferencia, pero el envío es 24h
-        const zonaNombre = reservaData.zona && reservaData.zona.nombre ? reservaData.zona.nombre : "No seleccionada";
+        const horaDisplay = reservaData.hora || "No elegida";
+        const zonaNombre = reservaData.zona?.nombre || "No seleccionada";
+        const monto = calcularMonto();
 
         // Resumen lateral (Paso 5)
         if (resumenDiv) {
@@ -415,80 +587,85 @@ document.addEventListener("DOMContentLoaded", () => {
                 <p><strong>Fecha:</strong> ${fechaStr}</p>
                 <p><strong>Hora:</strong> ${horaDisplay}</p>
                 <p><strong>Zona:</strong> ${zonaNombre}</p>
+                <p><strong>Monto a pagar:</strong> S/ ${monto.toFixed(2)}</p>
             `;
         }
-        
+
         // Resumen final (Paso 6)
         if (resumenFinal) {
             resumenFinal.innerHTML = `
                 <h3>Resumen de la reserva</h3>
                 <p><strong>Cliente:</strong> ${reservaData.nombre || ""} ${reservaData.apellidos || ""}</p>
                 <p><strong>Email:</strong> ${reservaData.email || ""}</p>
-                ${reservaData.numeroDocumento ? `<p><strong>DNI/RUC:</strong> ${reservaData.numeroDocumento}</p>` : ''}
+                ${reservaData.numeroDocumento ? `<p><strong>DNI:</strong> ${reservaData.numeroDocumento}</p>` : ''}
                 <hr style="border-top: 1px solid #eee;">
                 <p><strong>Personas:</strong> ${reservaData.personas || ""}</p>
                 <p><strong>Fecha:</strong> ${fechaStr}</p>
                 <p><strong>Hora:</strong> ${horaDisplay}</p>
                 <p><strong>Zona:</strong> ${zonaNombre}</p>
+                <p><strong>Monto a pagar:</strong> S/ ${monto.toFixed(2)}</p>
             `;
         }
     }
 
+    // Actualiza resumen cuando cambian personas manualmente (por si no hay evento)
+    if (inputPersonas) inputPersonas.addEventListener("change", actualizarResumen);
+
+    // ----------------------------
+    // BOTÓN FINAL: enviar al backend
+    // ----------------------------
     if (btnFinalizarReserva) {
-        btnFinalizarReserva.addEventListener("click", async (e) => { // Agregamos 'async'
+        btnFinalizarReserva.addEventListener("click", async (e) => {
             e.preventDefault();
 
-            // Campos de tarjeta (solo validación básica en frontend)
-            const nombreTarjeta = document.getElementById("nombre-tarjeta");
-            const numeroTarjeta = document.getElementById("numero-tarjeta");
-            const cvv = document.getElementById("cvv");
-            
-            if (!nombreTarjeta.value || !numeroTarjeta.value || !cvv.value) {
-                alert("Por favor, completa todos los datos de la tarjeta.");
+            // validación tarjeta básica
+            if (!nombreTarjeta || !numeroTarjeta || !cvv || !fechaExp) {
+                alert("Complete los datos de tarjeta.");
+                return;
+            }
+            if (!nombreTarjeta.value || !numeroTarjeta.value || !cvv.value || !fechaExp.value) {
+                alert("Por favor completa todos los datos de la tarjeta.");
                 return;
             }
 
-            // --- PREPARAR DATOS PARA EL ENVÍO AL BACKEND ---
-            const fechaISO = reservaData.fecha ? reservaData.fecha.toISOString().split("T")[0] : ''; // YYYY-MM-DD
-            const hora24h = reservaData.hora; // HH:mm
+            if (!formDatos.checkValidity()) {
+                formDatos.reportValidity();
+                return;
+            }
+
+            // Prepara envío
+            const fechaISO = reservaData.fecha ? reservaData.fecha.toISOString().split("T")[0] : '';
 
             const formData = new FormData();
+            formData.append("clienteNombre", reservaData.nombre);
+            formData.append("clienteApellidos", reservaData.apellidos);
+            formData.append("clienteEmail", reservaData.email);
+            formData.append("clienteTelefono", reservaData.telefono);
+            formData.append("numeroDocumento", reservaData.numeroDocumento);
+            formData.append("personas", Number(reservaData.personas));
+            formData.append("fechaReserva", fechaISO);
+            formData.append("horaReserva", reservaData.hora);
+            formData.append("zonaId", reservaData.zona ? reservaData.zona.id : "");
+            // opcional: enviar monto al backend si lo deseas
+            formData.append("monto", reservaData.monto);
 
-            // 1. Campos de Reserva (@ModelAttribute Reserva reserva)
-            formData.append('clienteNombre', reservaData.nombre);
-            formData.append('clienteApellidos', reservaData.apellidos);
-            formData.append('clienteEmail', reservaData.email);
-            formData.append('clienteTelefono', reservaData.telefono);
-            formData.append('numeroDocumento', reservaData.numeroDocumento);
-            formData.append('personas', Number(reservaData.personas));
-
-            // CRUCIAL: Fecha y Hora para el Mapeo de @ModelAttribute Y @RequestParam
-            formData.append('fechaReserva', fechaISO); 
-            formData.append('horaReserva', hora24h);   
-            
-            // 2. Parámetro adicional para @RequestParam("zonaId")
-            formData.append('zonaId', reservaData.zona.id);
-            
-            // --- ENVÍO DE DATOS AL BACKEND ---
             try {
-                const response = await fetch('/reserva', {
-                    method: 'POST',
-                    // Importante: URLSearchParams simula el envío de formulario para @ModelAttribute
-                    body: new URLSearchParams(formData) 
+                const response = await fetch("/reserva", {
+                    method: "POST",
+                    body: new URLSearchParams(formData)
                 });
 
                 if (response.ok) {
-                    alert("✅ ¡Reserva confirmada! Guardada en la base de datos.");
-                    // Redirige después de que el backend ha guardado y respondido OK
-                    window.location.href = "/"; 
+                    alert(`✅ ¡Reserva confirmada! Monto pagado (simulado): S/ ${reservaData.monto.toFixed(2)}`);
+                    window.location.href = "/";
                 } else {
-                    const errorText = await response.text();
-                    console.error("Error del servidor:", errorText);
-                    alert(`❌ Error al confirmar la reserva. El servidor respondió: ${response.status}. Revisa la consola para detalles.`);
+                    const text = await response.text();
+                    console.error("Error del servidor:", text);
+                    alert("Error al procesar la reserva en el servidor.");
                 }
-            } catch (error) {
-                console.error('Error de red al enviar la reserva:', error);
-                alert("❌ Error de conexión al servidor. Intente de nuevo.");
+            } catch (err) {
+                console.error(err);
+                alert("Error de conexión.");
             }
         });
     }

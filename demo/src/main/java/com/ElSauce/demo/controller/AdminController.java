@@ -2,7 +2,6 @@ package com.ElSauce.demo.controller;
 
 import com.ElSauce.demo.model.Reserva;
 import com.ElSauce.demo.model.User;
-import com.ElSauce.demo.service.HorarioPrefijadoService;
 import com.ElSauce.demo.service.MesaService;
 import com.ElSauce.demo.service.ReservaService;
 import com.ElSauce.demo.service.UserService;
@@ -12,7 +11,7 @@ import jakarta.servlet.http.HttpSession;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,9 +35,9 @@ public class AdminController {
     
     @Autowired
     private ZonaService zonaService; 
-    
     @Autowired
     private MesaService mesaService;
+
 
     // Página inicial del login admin
     @GetMapping("/admin")
@@ -104,9 +103,8 @@ public String reservas(
     // Datos base
     model.addAttribute("adminLogueado", admin);
     model.addAttribute("reserva", new Reserva());
-   model.addAttribute("zonas", zonaService.obtenerTodasLasZonas());
-   model.addAttribute("mesas", mesaService.obtenerTodasLasMesas());
-
+    model.addAttribute("zonas", zonaService.obtenerTodasLasZonas());
+    model.addAttribute("mesas", mesaService.obtenerTodasLasMesas());
     // Lista final de reservas
     List<Reserva> reservasList = reservaService.obtenerTodasLasReservas();
 
