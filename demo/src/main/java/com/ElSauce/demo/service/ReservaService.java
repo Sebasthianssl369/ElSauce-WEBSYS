@@ -19,6 +19,7 @@ import com.ElSauce.demo.model.Zona;
 import com.ElSauce.demo.repository.HorarioPrefijadoRepository;
 import com.ElSauce.demo.repository.MesaRepository;
 import com.ElSauce.demo.repository.ReservaRepository;
+import com.ElSauce.demo.repository.ZonaRepository;
 
 @Service
 public class ReservaService {
@@ -31,6 +32,8 @@ public class ReservaService {
     @Autowired
     private HorarioPrefijadoRepository horarioPrefijadoRepository;
 
+    @Autowired
+    private ZonaRepository zonaRepository;
     
     public Reserva guardarReserva(Reserva reserva){
         return reservaRepository.save(reserva);
@@ -95,28 +98,26 @@ public class ReservaService {
     return Optional.empty();
     }
 
-    public List<String> obtenerHorariosDisponibles(LocalDate fechaReserva, int zona, int mesa) {
-    // horarios totales desde repo (por ejemplo "12:00:00" strings)
-    List<String> todosHorarios = horarioPrefijadoRepository.findAllHoras(); // asume List<String> "HH:mm:ss"
+  
+    public List<String> obtenerHorariosDisponibles(LocalDate fecha, Integer zonaId, Integer mesaId) {
 
-    // horarios ocupados desde ReservaRepository --> List<LocalTime>
-    List<LocalTime> horariosOcupados(LocalDate fecha, Zona zona, Mesa mesa){
-         reservaRepository.findHorasOcupadas(fechaReserva, zona.getId(), mesa.getId());
-    }    
-    // convertir ocupados a formato "HH:mm:ss" para comparar con todosHorarios
-    Set<String> ocupadosStr = horariosOcupados.stream()
-        .map(t -> t.toString()) // LocalTime.toString() => "HH:mm[:ss]" (ej "13:30" o "13:30:00")
-        .map(s -> {
-            // asegura formato "HH:mm:ss"
-            if (s.length() == 5) return s + ":00";
-            return s;
-        })
-        .collect(Collectors.toSet());
+    // 1. Horarios totales como STRING (12:00:00 ...)
+    List<String> todosHorarios = horarioPrefijadoRepository.findAllHoras();
 
+    // 2. Horarios ocupados desde la BD (LocalTime)
+    List<LocalTime> ocupados = reservaRepository.findHorasOcupadas(fecha, zonaId, mesaId);
+
+    // 3. Convertir LocalTime → String "HH:mm:ss"
+    Set<String> ocupadosStr = ocupados.stream()
+            .map(t -> t.toString().length() == 5 ? t + ":00" : t.toString())
+            .collect(Collectors.toSet());
+
+    // 4. Filtrar los disponibles
     return todosHorarios.stream()
             .filter(h -> !ocupadosStr.contains(h))
-            .collect(Collectors.toList());
+            .toList();
 }
+
 
 
 

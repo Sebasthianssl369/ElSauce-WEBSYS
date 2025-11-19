@@ -25,7 +25,7 @@ public class MesaService {
         mesaRepository.deleteById(id);
     }
 
-    public int obtenerMesaSegunPersonas(int personas) {
+    public int obtenerMesaSegunPersonasYZona(int personas, int zonaId) {
 
         if (personas <= 2) return 1;  // mesa 2
         if (personas <= 4) return 2;  // mesa 4

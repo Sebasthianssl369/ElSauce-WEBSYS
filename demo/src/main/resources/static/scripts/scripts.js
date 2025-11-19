@@ -250,7 +250,7 @@ const slidesContainer = document.querySelector(".zona-slides");
 const prevZona = document.querySelector(".zona-nav.prev");
 const nextZona = document.querySelector(".zona-nav.next");
 
-const url = `/api/horarios/disponibles?fecha=${fechaISO}&zonaId=${zonaId}&personas=${personas}`;
+
 
 if (slides.length && slidesContainer && prevZona && nextZona) {
     let currentZonaIndex = 0;

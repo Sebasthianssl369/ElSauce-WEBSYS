@@ -13,6 +13,7 @@ import com.ElSauce.demo.Enum.EstadoReserva;
 
 import com.ElSauce.demo.model.Mesa;
 import com.ElSauce.demo.model.Reserva;
+import com.ElSauce.demo.model.Zona;
 
 
 public interface ReservaRepository extends JpaRepository<Reserva,Long>{
@@ -24,17 +25,19 @@ public interface ReservaRepository extends JpaRepository<Reserva,Long>{
 
 
     @Query("""
-        SELECT r.horaReserva
-        FROM Reserva r
-        WHERE r.fechaReserva = :fecha
-        AND r.zona.id = :zonaId
-        AND r.mesa.id = :mesaId
-        AND r.estado IN ('PENDIENTE', 'ASISTIO')
-    """)
-    List<LocalTime> findHorasOcupadas(
-            @Param("fecha") LocalDate fechaReserva,
-            @Param("zonaId") Integer zonaId,
-            @Param("mesaId") Long mesaId
-    );
+    SELECT r.horaReserva
+    FROM Reserva r
+    WHERE r.fechaReserva = :fecha
+    AND r.zona.id = :zonaId
+    AND r.mesa.id = :mesaId
+    AND r.estado IN ('PENDIENTE', 'ASISTIO')
+""")
+List<LocalTime> findHorasOcupadas(
+        @Param("fecha") LocalDate fecha,
+        @Param("zonaId") Integer zonaId,
+        @Param("mesaId") Integer mesaId
+);
+
+
 
 }

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
 import com.ElSauce.demo.Enum.EstadoPago;
-import com.ElSauce.demo.Enum.EstadoReserva;
+
 import com.ElSauce.demo.model.Mesa;
 import com.ElSauce.demo.model.Pago;
 import com.ElSauce.demo.model.Reserva;
@@ -157,15 +157,24 @@ public String postMethodName(@ModelAttribute Reserva reserva,
             return "redirect:/index"; 
         }
     }
+
     
     @GetMapping("/api/horarios/disponibles")
     @ResponseBody
     public List<String> obtenerHorariosDisponibles(
         @RequestParam int personas,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaReserva,
-        @RequestParam("zona") int zona
+        @RequestParam("zona") int zonaId
+  
     ) {
-    int mesa = mesaService.obtenerMesaSegunPersonas(personas);
-    return reservaService.obtenerHorariosDisponibles(fechaReserva, zona, mesa);
-}
-}
+    
+    Mesa mesaCalculada = mesaService.obtenerMesaSegunPersonasYZona(personas, zonaId);
+
+    // 2. Obtener horarios disponibles usando la mesa calculada
+    return reservaService.obtenerHorariosDisponibles(
+            fechaReserva,
+            zonaId,
+            mesaCalculada.getId()
+    );
+    
+}}
