@@ -1,15 +1,22 @@
 package com.ElSauce.demo.controller;
 
+import com.ElSauce.demo.Enum.EstadoPago;
+import com.ElSauce.demo.model.Mesa;
+import com.ElSauce.demo.model.Pago;
 import com.ElSauce.demo.model.Reserva;
 import com.ElSauce.demo.model.User;
+import com.ElSauce.demo.model.Zona;
 import com.ElSauce.demo.service.MesaService;
+import com.ElSauce.demo.service.PagoService;
 import com.ElSauce.demo.service.ReservaService;
 import com.ElSauce.demo.service.UserService;
 import com.ElSauce.demo.service.ZonaService;
 
 import jakarta.servlet.http.HttpSession;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import java.util.List;
@@ -21,6 +28,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -37,6 +45,9 @@ public class AdminController {
     private ZonaService zonaService; 
     @Autowired
     private MesaService mesaService;
+
+    @Autowired
+    private PagoService pagoService;
 
 
     // Página inicial del login admin
@@ -186,6 +197,91 @@ public String eliminarReserva(@RequestParam("id") Long id, RedirectAttributes re
     // 5. Redirige al listado principal
     return "redirect:/dashboard-reservas";
 }
+
+
+@PostMapping("/dashboard-reservas/guardar")
+    public String guardarReservaAdmin(
+            @ModelAttribute Reserva reserva,
+            @RequestParam("zona") Integer zonaId,
+            @RequestParam("horaReserva") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime horaReservaStr,
+            @RequestParam(value = "numeroTarjeta", required = false) String numeroTarjeta,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+
+        // 1. VERIFICAR SESIÓN DE ADMIN
+        User admin = (User) session.getAttribute("adminLogueado");
+        if (admin == null) {
+            return "redirect:/admin";
+        }
+
+        try {
+            // 2. COMPLETAR DATOS DE LA RESERVA
+            // El admin registra la reserva. Dependiendo de tu lógica, puedes asignar 
+            // al admin como usuario, o dejarlo null si el User es solo para clientes web.
+            reserva.setUser(admin); 
+            
+            // Buscar la zona seleccionada
+            Zona zona = zonaService.buscarZonaPorID(zonaId)
+                    .orElseThrow(() -> new RuntimeException("Zona no encontrada"));
+            
+            reserva.setZona(zona);
+            reserva.setHoraReserva(horaReservaStr); // La hora que vino del JS
+            reserva.setCreatedAt(LocalDateTime.now()); // Hora actual
+
+            // 3. ASIGNAR MESA AUTOMÁTICA (Crucial)
+            // Buscamos una mesa libre para esa zona, fecha, hora y cantidad de personas
+            Optional<Mesa> mesaOpt = reservaService.asignarMesaParaReserva(
+                zonaId, 
+                reserva.getPersonas(), 
+                reserva.getFechaReserva(), 
+                horaReservaStr
+            );
+
+            if (mesaOpt.isEmpty()) {
+                redirectAttributes.addFlashAttribute("errorMessage", "❌ No hay mesas disponibles para esa capacidad en ese horario.");
+                return "redirect:/dashboard-reservas";
+            }
+            reserva.setMesa(mesaOpt.get());
+
+            // 4. GUARDAR LA RESERVA
+            Reserva reservaGuardada = reservaService.guardarReserva(reserva);
+
+            // 5. GENERAR EL PAGO
+            // Recalculamos el monto en el backend por seguridad
+            double precioBase = 7.00; 
+            if(zona.getNombre().contains("Muelle")) precioBase = 8.00;
+            else if(zona.getNombre().contains("Mirador")) precioBase = 9.00;
+            else if(zona.getNombre().contains("Bosque")) precioBase = 10.00;
+
+            BigDecimal monto = BigDecimal.valueOf(reserva.getPersonas() * precioBase);
+
+            Pago pago = new Pago();
+            pago.setReserva(reservaGuardada);
+            pago.setFechaTransaccion(LocalDateTime.now());
+            pago.setMonto(monto);
+            
+            // Lógica simple: Si admin puso tarjeta, es tarjeta. Si no, asumimos Efectivo.
+            if (numeroTarjeta != null && !numeroTarjeta.trim().isEmpty()) {
+                pago.setMetodoPago("Tarjeta (Admin)");
+                pago.setIdTransaccion("ADM-CARD-" + System.currentTimeMillis());
+                pago.setEstadoPago(EstadoPago.PAID);
+            } else {
+                pago.setMetodoPago("Efectivo");
+                pago.setIdTransaccion("ADM-CASH-" + System.currentTimeMillis());
+                pago.setEstadoPago(EstadoPago.PENDING); 
+            }
+            
+            pagoService.guardarPago(pago);
+
+            redirectAttributes.addFlashAttribute("successMessage", "✅ Reserva creada exitosamente.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("errorMessage", "❌ Error al guardar: " + e.getMessage());
+        }
+
+        return "redirect:/dashboard-reservas";
+    }
 
 
     // Cierre de sesión

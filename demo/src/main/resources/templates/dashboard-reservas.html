@@ -21,7 +21,7 @@
 
      <div id="section-add" class="section hidden">
     <h2>➕ Agregar Nueva Reserva</h2>
-    <form th:action="@{/reserva}" method="post" th:object="${reserva}" id="formAgregarReserva">
+    <form th:action="@{/dashboard-reservas/guardar}" method="post" th:object="${reserva}" id="formAgregarReserva">
 
         <!-- Redirección después de guardar -->
         <input type="hidden" name="redirect" value="dashboard-reservas" /> 
