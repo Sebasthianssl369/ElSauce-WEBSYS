@@ -13,7 +13,6 @@ import com.ElSauce.demo.Enum.EstadoReserva;
 
 import com.ElSauce.demo.model.Mesa;
 import com.ElSauce.demo.model.Reserva;
-import com.ElSauce.demo.model.Zona;
 
 
 public interface ReservaRepository extends JpaRepository<Reserva,Long>{

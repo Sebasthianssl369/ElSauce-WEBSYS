@@ -326,23 +326,6 @@ if (slides.length && slidesContainer && prevZona && nextZona) {
         });
     }
 
-    async function fetchHorarios() {
-        if (!horaGrid) return;
-
-        try {
-            const response = await fetch('/api/horarios'); 
-            if (!response.ok) {
-                throw new Error('Error al cargar los horarios: ' + response.statusText);
-            }
-            const data = await response.json(); 
-            renderHorarios(data);
-        } catch (error) {
-            console.error('Fallo en fetchHorarios. Usando horarios estáticos de respaldo.', error);
-            const horariosRespaldo = ["12:00:00", "13:30:00", "15:00:00", "19:00:00", "20:30:00", "21:00:00"];
-            renderHorarios(horariosRespaldo); 
-        }
-    }
-
     if (horaGrid) {
         fetchHorarios();
     }
@@ -356,7 +339,7 @@ if (slides.length && slidesContainer && prevZona && nextZona) {
 
     try {
         const url =
-            `/api/horarios/disponibles?fecha=${fechaISO}&zonaId=${zonaId}&personas=${personas}`;
+            `/api/horarios/disponibles?fechaReserva=${fechaISO}&zona=${zonaId}&personas=${personas}`;
 
         const response = await fetch(url);
         if (!response.ok) throw new Error("No se pudo cargar horarios disponibles");
@@ -645,7 +628,7 @@ slides.forEach(slide => {
             formData.append("personas", Number(reservaData.personas));
             formData.append("fechaReserva", fechaISO);
             formData.append("horaReserva", reservaData.hora);
-            formData.append("zonaId", reservaData.zona ? reservaData.zona.id : "");
+            formData.append("zona", reservaData.zona ? reservaData.zona.id : "");
             // opcional: enviar monto al backend si lo deseas
             formData.append("monto", reservaData.monto);
 

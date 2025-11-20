@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class Role {
 
     @Id
-    private Long id;
+    private Integer id;
 
     @Column(name = "nombre", length = 50, nullable = false, unique = true)
     private String nombre;
@@ -35,11 +35,11 @@ public class Role {
     }
 
     //Getter and Setter
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

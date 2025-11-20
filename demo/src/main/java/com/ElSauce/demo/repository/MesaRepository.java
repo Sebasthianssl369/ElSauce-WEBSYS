@@ -10,4 +10,5 @@ import com.ElSauce.demo.model.Mesa;
 @Repository
 public interface MesaRepository extends JpaRepository<Mesa,Integer>{
     List<Mesa> findByZonaIdAndCapacidadGreaterThanEqualOrderByCapacidadAsc(Integer zonaId, Integer capacidad);
+    Mesa findByZona_IdAndCapacidad(Integer id, Integer personasIngresada);
 }

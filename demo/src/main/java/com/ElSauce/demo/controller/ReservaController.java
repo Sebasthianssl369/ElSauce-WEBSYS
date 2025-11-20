@@ -170,6 +170,7 @@ public String postMethodName(@ModelAttribute Reserva reserva,
     
     Mesa mesaCalculada = mesaService.obtenerMesaSegunPersonasYZona(personas, zonaId);
 
+
     // 2. Obtener horarios disponibles usando la mesa calculada
     return reservaService.obtenerHorariosDisponibles(
             fechaReserva,

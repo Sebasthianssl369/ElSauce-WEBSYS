@@ -25,13 +25,14 @@ public class MesaService {
         mesaRepository.deleteById(id);
     }
 
-    public int obtenerMesaSegunPersonasYZona(int personas, int zonaId) {
-
-        if (personas <= 2) return 1;  // mesa 2
-        if (personas <= 4) return 2;  // mesa 4
-        if (personas <= 6) return 3;  // mesa 6
-        if (personas <= 8) return 4;  // mesa 8
-
-        return -1; // no disponible
-    }
+public Mesa obtenerMesaSegunPersonasYZona(Integer personas, Integer zonaId) {
+        Integer personasMax = switch (personas) {
+        case 1,2 -> 2;
+        case 3,4 -> 4;
+        case 5,6 -> 6;
+        case 7,8 -> 8;
+        default -> personas;
+    };
+        return mesaRepository.findByZona_IdAndCapacidad(zonaId, personasMax);
+   }
 }

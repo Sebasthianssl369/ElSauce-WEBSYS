@@ -15,11 +15,10 @@ import org.springframework.stereotype.Service;
 import com.ElSauce.demo.Enum.EstadoReserva;
 import com.ElSauce.demo.model.Mesa;
 import com.ElSauce.demo.model.Reserva;
-import com.ElSauce.demo.model.Zona;
 import com.ElSauce.demo.repository.HorarioPrefijadoRepository;
 import com.ElSauce.demo.repository.MesaRepository;
 import com.ElSauce.demo.repository.ReservaRepository;
-import com.ElSauce.demo.repository.ZonaRepository;
+
 
 @Service
 public class ReservaService {
@@ -32,8 +31,6 @@ public class ReservaService {
     @Autowired
     private HorarioPrefijadoRepository horarioPrefijadoRepository;
 
-    @Autowired
-    private ZonaRepository zonaRepository;
     
     public Reserva guardarReserva(Reserva reserva){
         return reservaRepository.save(reserva);
@@ -98,25 +95,30 @@ public class ReservaService {
     return Optional.empty();
     }
 
-  
-    public List<String> obtenerHorariosDisponibles(LocalDate fecha, Integer zonaId, Integer mesaId) {
+  public List<String> obtenerHorariosDisponibles(LocalDate fecha, Integer zonaId, Integer mesaId) {
 
-    // 1. Horarios totales como STRING (12:00:00 ...)
-    List<String> todosHorarios = horarioPrefijadoRepository.findAllHoras();
+    // 1. Horarios totales como LocalTime
+    List<LocalTime> todosHorarios = horarioPrefijadoRepository.findAllHoras();
 
-    // 2. Horarios ocupados desde la BD (LocalTime)
+    // 2. Horarios ocupados como LocalTime
     List<LocalTime> ocupados = reservaRepository.findHorasOcupadas(fecha, zonaId, mesaId);
 
-    // 3. Convertir LocalTime → String "HH:mm:ss"
+    // 3. Convertir los ocupados a String "HH:mm:ss"
     Set<String> ocupadosStr = ocupados.stream()
             .map(t -> t.toString().length() == 5 ? t + ":00" : t.toString())
             .collect(Collectors.toSet());
 
-    // 4. Filtrar los disponibles
-    return todosHorarios.stream()
+    // 4. Convertir todos los horarios a String "HH:mm:ss"
+    List<String> todosStr = todosHorarios.stream()
+            .map(t -> t.toString().length() == 5 ? t + ":00" : t.toString())
+            .toList();
+
+    // 5. Filtrar disponibles (String vs String)
+    return todosStr.stream()
             .filter(h -> !ocupadosStr.contains(h))
             .toList();
 }
+
 
 
 
