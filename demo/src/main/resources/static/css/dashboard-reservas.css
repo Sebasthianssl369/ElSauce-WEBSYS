@@ -90,8 +90,10 @@ body {
   background: white;
 }
 
-.section { display: none; }
+.section { display: block; }
 .section.active { display: block; }
+.hidden { display: none !important; }
+
 
 form {
   display: flex;
@@ -204,3 +206,46 @@ button[type="submit"]:hover { background: #2ecc71; }
 .reserve-table button:hover {
   background: #e74c3c;
 }
+
+/* ===== HORARIOS DISPONIBLES ===== */
+
+.horarios-box {
+    margin-top: 15px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    background: #fafafa;
+    border-radius: 8px;
+    min-height: 60px;
+}
+
+.horarios-box p {
+    margin: 5px 0;
+    color: #555;
+}
+
+/* Botones de hora */
+.hora-btn {
+    margin: 4px;
+    padding: 8px 14px;
+    font-size: 0.95rem;
+    border: 1px solid #888;
+    background: #ffffff;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.hora-btn:hover {
+    background: #e0e0e0;
+}
+
+/* Botón seleccionado */
+.hora-btn.active,
+.hora-btn.selected {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+    font-weight: bold;
+}
+
+

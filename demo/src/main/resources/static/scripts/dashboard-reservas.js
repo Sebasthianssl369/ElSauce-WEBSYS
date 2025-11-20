@@ -1,137 +1,135 @@
-// dashboard-reservas.js (versión corregida y robusta)
 
-function showSection(section) {
-  document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
-  document.getElementById(`section-${section}`).classList.add('active');
-}
+document.addEventListener("DOMContentLoaded", () => {
 
-// DOM
-const reserveList   = document.getElementById('reserveList');
-const filterDate    = document.getElementById('filterDate');
-const filterPeople  = document.getElementById('filterPeople');
-const filterName    = document.getElementById('filterName');
-const applyFilters  = document.getElementById('applyFilters');
-const clearFilters  = document.getElementById('clearFilters');
-
-
-// Agregar reserva
-if (reserveForm) {
-  reserveForm.addEventListener('submit', e => {
-    e.preventDefault();
-
-
-    const name   = document.getElementById('resName').value.trim();
-    const date   = document.getElementById('resDate').value;
-    const time   = document.getElementById('resTime').value;
-    const people = Number(document.getElementById('resPeople').value);
-    const mesa= Number(document.getElementById('resMesa').value);
-    const zona  = document.getElementById('resZona').value.trim();
-
-    if (!name || !date || !time || !people) return;
-
-    const newRes = {
-      id: Date.now() + Math.floor(Math.random() * 10000),
-      name,
-      date,
-      time,
-      people,
-      mesa:mesa,
-      zone: zona
-    };
-
-    reservas.push(newRes);
-    localStorage.setItem('reservas', JSON.stringify(reservas));
-    renderReservas(reservas);
-    reserveForm.reset();
-    alert('Reserva guardada ✅');
-  });
-}
-
-// Aplicar filtros
-if (applyFilters) {
-  applyFilters.addEventListener('click', () => {
-    const fDateVal = filterDate.value;
-    const fPeopleVal = (filterPeople.value || '').toString().trim();
-    const fPeople = fPeopleVal === '' ? null : Number(fPeopleVal);
-    const fName = (filterName.value || '').trim().toLowerCase();
-    const fTime = filterTime.value;
-
-    const filtradas = reservas.filter(r => {
-      const matchDate = fDateVal ? r.date === fDateVal : true;
-      const matchPeople = (fPeople === null) ? true : (Number(r.people) === fPeople);
-      const matchName = fName ? r.name.toLowerCase().includes(fName) : true;
-      const matchTime = fTime ? (r.time.startsWith(fTime)) : true;
-      return matchDate && matchPeople && matchName && matchTime;
+    // ===============================
+    //   SELECCIÓN DE SECCIONES
+    // ===============================
+    document.querySelectorAll(".btn[data-section]").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const section = btn.getAttribute("data-section");
+            showSection(section);
+        });
     });
 
-    renderReservas(filtradas);
-  });
+    function showSection(section) {
+    const add = document.getElementById("section-add");
+    const list = document.getElementById("section-list");
+
+    if (section === "add") {
+        add.classList.remove("hidden");
+        add.classList.add("active");
+        list.classList.add("hidden");
+        list.classList.remove("active");
+    } else {
+        list.classList.remove("hidden");
+        list.classList.add("active");
+        add.classList.add("hidden");
+        add.classList.remove("active");
+    }
 }
 
-// Limpiar filtros
-if (clearFilters) {
-  clearFilters.addEventListener('click', () => {
-    filterDate.value = '';
-    filterPeople.value = '';
-    filterName.value = '';
-    filterTime.value = '';
-    renderReservas(reservas);
-  });
-}
 
-// Renderizado (recibe un arreglo de reservas a mostrar)
-function renderReservas(lista) {
-  if (!reserveList) return;
-  reserveList.innerHTML = '';
+    // Abrir lista por defecto
+    showSection("list");
 
-  lista.forEach((res, index) => {
-    const tr = document.createElement('tr');
-    tr.dataset.id = res.id || index+1;
+    // ===============================
+    //   ELEMENTOS DE RESERVA
+    // ===============================
+    const personas = document.getElementById("personas");
+    const fecha = document.getElementById("fechaReserva");
+    const zona = document.getElementById("zona");
+    const horaHidden = document.getElementById("horaReserva");
+    const horariosContainer = document.getElementById("horariosContainer");
+    const montoInput = document.getElementById("monto");
 
-    tr.innerHTML = `
-      <td>${res.id || index + 1}</td> 
-      <td>${escapeHtml(res.name)}</td>
-      <td>${escapeHtml(res.date)}</td>
-      <td>${escapeHtml(res.time)}</td>
-      <td>${escapeHtml(String(res.people))}</td>
-      <td>${escapeHtml(String(res.mesa))}</td>
-            <td>${escapeHtml(res.zone)}</td> 
-      <td>
-        <button class="delete-btn">Eliminar</button>
-      </td>
-    `;
+    if (!personas || !fecha || !zona || !horariosContainer || !montoInput) {
+        console.error("Faltan elementos importantes en el DOM");
+        return;
+    }
 
-    // ... (el resto de la función se mantiene)
-    // ...
-  });
-}
+    // ===============================
+    //   FUNCION CALCULAR MONTO
+    // ===============================
+    function calcularMonto() {
+        const personasNum = Number(personas.value) || 0;
+        const zonaNombre = zona.options[zona.selectedIndex]?.text || "";
+        let precioUnit = 7.00;
 
-function loadFilterTimes() {
-    const selectFiltro = document.getElementById("filterTime");
-    if (!selectFiltro) return;
+        switch (zonaNombre) {
+            case "Muelle Panorámico": precioUnit = 8.00; break;
+            case "Mirador Azul": precioUnit = 9.00; break;
+            case "Salón Bosque": precioUnit = 10.00; break;
+        }
 
-    horariosDisponibles.forEach(hora => {
-        const op = document.createElement("option");
-        op.value = hora;
-        op.textContent = hora;
-        selectFiltro.appendChild(op);
+        const monto = personasNum * precioUnit;
+        montoInput.value = monto.toFixed(2);
+    }
+
+    personas.addEventListener("input", calcularMonto);
+    zona.addEventListener("change", calcularMonto);
+
+    // ===============================
+    //   FUNCIONES DE HORARIOS
+    // ===============================
+    function renderHorarios(lista) {
+        horariosContainer.innerHTML = "";
+
+        if (!lista || lista.length === 0) {
+            horariosContainer.innerHTML = `<p class="text-danger">No hay horarios disponibles.</p>`;
+            return;
+        }
+
+        lista.forEach(h => {
+            const btn = document.createElement("button");
+            btn.textContent = h;
+            btn.type = "button";
+            btn.className = "hora-btn";
+
+            btn.addEventListener("click", () => {
+                horaHidden.value = h;
+                horariosContainer.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+            });
+
+            horariosContainer.appendChild(btn);
+        });
+    }
+
+    async function cargarHorarios() {
+        if (!personas.value || !fecha.value || !zona.value) {
+            horariosContainer.innerHTML = `<p class="text-muted">Selecciona primero personas, zona y fecha.</p>`;
+            return;
+        }
+
+        horariosContainer.innerHTML = `<p>Cargando...</p>`;
+
+        const url = `/api/horarios/disponibles?personas=${personas.value}&fechaReserva=${fecha.value}&zona=${zona.value}`;
+
+        try {
+            const resp = await fetch(url);
+            const data = await resp.json();
+            console.log("Horarios disponibles:", data);
+            renderHorarios(data);
+        } catch (error) {
+            console.error("Error cargando horarios:", error);
+            horariosContainer.innerHTML = `<p class="text-danger">Error cargando horarios.</p>`;
+        }
+    }
+
+    personas.addEventListener("change", cargarHorarios);
+    fecha.addEventListener("change", cargarHorarios);
+    zona.addEventListener("change", cargarHorarios);
+
+    // ===============================
+    //   ENVÍO DEL FORMULARIO
+    // ===============================
+    const form = document.getElementById("formAgregarReserva");
+    form.addEventListener("submit", (e) => {
+        if (!horaHidden.value) {
+            e.preventDefault();
+            alert("Debes seleccionar una hora para la reserva.");
+        }
     });
-}
 
-loadFilterTimes();
+});
 
-
-
-// pequeña utilidad para evitar inyección de HTML en los campos
-function escapeHtml(text) {
-  return String(text)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    
-    .replace(/'/g, '&#039;');
-}
-
-
-  

@@ -8,43 +8,58 @@
   <main class="main-content">
     <!-- ====== SIDEBAR ====== -->
     <aside class="sidebar">
-      <button class="btn" onclick="showSection('add')">➕ Agregar Reserva</button>
-      <button class="btn" onclick="showSection('list')">📋 Ver/Filtrar Reservas</button>
+      <button type="button" class="btn" data-section="add">➕ Agregar Reserva</button>
+       <button type="button" class="btn" data-section="list">📄 Ver Reservas</button>
     </aside>
 
     <!-- ====== CONTENIDO ====== -->
     <section class="content">
 
-            <div th:if="${reservaGuardada}" class="alert alert-success">
-        ¡Reserva guardada exitosamente! ✅
-      </div>
+     <div th:if="${reservaGuardada}" class="alert alert-success">
+        ¡Reserva guardada exitosamente! ✅
+     </div>
 
-            <div id="section-add" class="section hidden">
+     <div id="section-add" class="section hidden">
     <h2>➕ Agregar Nueva Reserva</h2>
-    <form th:action="@{/reserva/guardar}" method="post" th:object="${reserva}">
-        
-        <input type="hidden" name="redirect" value="dashboard" /> 
-          
-                <input type="text" placeholder="Nombre" th:field="*{clienteNombre}" required />
-        <input type="text" placeholder="Apellido" th:field="*{clienteApellidos}" required />
-        <input type="email" placeholder="Email" th:field="*{clienteEmail}" required />
-        <input type="tel" placeholder="Teléfono" th:field="*{clienteTelefono}" required />
+    <form th:action="@{/reserva}" method="post" th:object="${reserva}" id="formAgregarReserva">
 
-                <input type="date" required th:field="*{fechaReserva}" onchange="updateAvailableTimes()"/> 
-      
-        <select required th:field="*{horaReserva}">
-            <option value="">Selecciona Hora</option>
-        </select>
+        <!-- Redirección después de guardar -->
+        <input type="hidden" name="redirect" value="dashboard-reservas" /> 
 
-        <input type="number" min="1" placeholder="Nº de personas" th:field="*{personas}" required />
-        
-        <select required th:field="*{zona}"> 
-            <option value="">Selecciona Zona</option>
+        <!-- Datos del cliente -->
+        <input type="text" placeholder="Nombre" th:field="*{clienteNombre}" required />
+        <input type="text" placeholder="Apellido" th:field="*{clienteApellidos}" required />
+        <input type="email" placeholder="Email" th:field="*{clienteEmail}" required />
+        <input type="tel" placeholder="Teléfono" th:field="*{clienteTelefono}" required />
+        <input type="text" placeholder="DNI" th:field="*{numeroDocumento}" maxlength="8" required />
+
+        <!-- Reserva -->
+        <input type="number" min="1" placeholder="Nº de personas" th:field="*{personas}" id="personas" required />
+        <input type="date" th:field="*{fechaReserva}" id="fechaReserva" required />
+        <select th:field="*{zona}" id="zona" required>
+            <option value="">Selecciona Zona</option>
             <option th:each="zona : ${zonas}" 
                     th:value="${zona.id}" 
                     th:text="${zona.nombre}">Salón Bosque</option>
-        </select>
-        
+        </select>
+
+        <!-- Hora de reserva (oculto, se selecciona con botones) -->
+        <input type="hidden" name="horaReserva" id="horaReserva" required />
+
+        <!-- Contenedor de botones horarios -->
+        <div id="horariosContainer" class="horarios-box">
+            <p class="text-muted">Selecciona primero personas, zona y fecha.</p>
+        </div>
+
+        <!-- Datos de pago -->
+        <h4>💳 Datos de Pago</h4>
+        <input type="text" placeholder="Número de tarjeta" id="numeroTarjeta" maxlength="16" required />
+        <input type="month" placeholder="MM/AAAA" id="fechaVencimiento" required />
+        <input type="text" placeholder="CVV" id="cvv" maxlength="4" required />
+
+        <!-- Monto calculado -->
+        <input type="text" id="monto" placeholder="Monto Total" readonly />
+
         <button type="submit">Guardar Reserva</button>
     </form>
 </div>
@@ -76,9 +91,15 @@
 
                 <div class="col-md-2">
                     <label for="filterTime" class="form-label">Hora</label>
-                    <select class="form-control" id="filterTime" name="filterTime">
-                      <option value="">Seleccione una hora</option>
+                    <select id="filterTime">
+                        <option value="">Todos</option>
+                        <!-- Thymeleaf inyecta -->
+                        <option th:each="h : ${horarios}"
+                            th:value="${h.hora}"
+                            th:text="${h.hora}">
+                        </option>
                     </select>
+
                 </div>
                 
                 <div class="col-md-2">
