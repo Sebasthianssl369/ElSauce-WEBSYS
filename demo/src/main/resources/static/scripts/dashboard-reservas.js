@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", () => {
 
     // ===============================
@@ -12,47 +11,94 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     function showSection(section) {
-    const add = document.getElementById("section-add");
-    const list = document.getElementById("section-list");
+        const add = document.getElementById("section-add");
+        const list = document.getElementById("section-list");
 
-    if (section === "add") {
-        add.classList.remove("hidden");
-        add.classList.add("active");
-        list.classList.add("hidden");
-        list.classList.remove("active");
-    } else {
-        list.classList.remove("hidden");
-        list.classList.add("active");
-        add.classList.add("hidden");
-        add.classList.remove("active");
+        if (section === "add") {
+            add.classList.remove("hidden");
+            add.classList.add("active");
+            list.classList.add("hidden");
+            list.classList.remove("active");
+        } else {
+            list.classList.remove("hidden");
+            list.classList.add("active");
+            add.classList.add("hidden");
+            add.classList.remove("active");
+        }
     }
-}
 
-
-    // Abrir lista por defecto
     showSection("list");
 
     // ===============================
-    //   ELEMENTOS DE RESERVA
+    //   ELEMENTOS DEL DOM
     // ===============================
-    const personas = document.getElementById("personas");
-    const fecha = document.getElementById("fechaReserva");
-    const zona = document.getElementById("zona");
+    const telefonoInput = document.getElementById("telefono");
+    const dniInput = document.getElementById("dni");
+    const personasInput = document.getElementById("personas");
+    const fechaInput = document.getElementById("fechaReserva");
+    const zonaInput = document.getElementById("zona");
     const horaHidden = document.getElementById("horaReserva");
     const horariosContainer = document.getElementById("horariosContainer");
     const montoInput = document.getElementById("monto");
+    const form = document.getElementById("formAgregarReserva");
 
-    if (!personas || !fecha || !zona || !horariosContainer || !montoInput) {
-        console.error("Faltan elementos importantes en el DOM");
+    if (!personasInput || !fechaInput || !zonaInput || !horariosContainer || !montoInput || !form) {
+        console.error("Faltan elementos esenciales en el DOM.");
         return;
     }
 
     // ===============================
-    //   FUNCION CALCULAR MONTO
+    //   VALIDACIONES SIMPLIFICADAS
+    // ===============================
+
+    // Teléfono: solo 9 dígitos
+    if (telefonoInput) {
+        telefonoInput.addEventListener("input", () => {
+            telefonoInput.value = telefonoInput.value.replace(/\D/g, "").slice(0, 9);
+        });
+    }
+
+    // DNI: solo 8 dígitos
+    if (dniInput) {
+        dniInput.addEventListener("input", () => {
+            dniInput.value = dniInput.value.replace(/\D/g, "").slice(0, 8);
+        });
+    }
+
+    // Personas: entre 1 y 8
+    if (personasInput) {
+        personasInput.addEventListener("input", () => {
+            let n = Number(personasInput.value) || 0;
+            if (n < 1) personasInput.value = 1;
+            if (n > 8) personasInput.value = 8;
+        });
+    }
+
+    // Fecha: mínimo hoy (local)
+   // Fecha: mínimo hoy o mañana si ya pasaron las 10 PM
+// Fecha: mínimo hoy o mañana si ya pasaron las 22:00
+if (fechaInput) {
+    const ahora = new Date();
+    let minFecha = new Date();
+
+    // Si la hora actual es >= 22, la mínima será mañana
+    if (ahora.getHours() >= 22) {
+        minFecha.setDate(minFecha.getDate() + 1);
+    }
+
+    const dia = String(minFecha.getDate()).padStart(2, "0");
+    const mes = String(minFecha.getMonth() + 1).padStart(2, "0");
+    const anio = minFecha.getFullYear();
+    fechaInput.setAttribute("min", `${anio}-${mes}-${dia}`);
+}
+
+
+    // ===============================
+    //   CÁLCULO DE MONTO
     // ===============================
     function calcularMonto() {
-        const personasNum = Number(personas.value) || 0;
-        const zonaNombre = zona.options[zona.selectedIndex]?.text || "";
+        const personasNum = Number(personasInput.value) || 0;
+        const zonaNombre = zonaInput.options[zonaInput.selectedIndex]?.text || "";
         let precioUnit = 7.00;
 
         switch (zonaNombre) {
@@ -62,53 +108,80 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const monto = personasNum * precioUnit;
-        montoInput.value = monto.toFixed(2);
+        montoInput.value = monto ? monto.toFixed(2) : "";
     }
 
-    personas.addEventListener("input", calcularMonto);
-    zona.addEventListener("change", calcularMonto);
+    personasInput.addEventListener("input", calcularMonto);
+    zonaInput.addEventListener("change", calcularMonto);
 
     // ===============================
-    //   FUNCIONES DE HORARIOS
+    //   HORARIOS DISPONIBLES
     // ===============================
     function renderHorarios(lista) {
-        horariosContainer.innerHTML = "";
+    horariosContainer.innerHTML = "";
 
-        if (!lista || lista.length === 0) {
-            horariosContainer.innerHTML = `<p class="text-danger">No hay horarios disponibles.</p>`;
-            return;
-        }
+    if (!lista || lista.length === 0) {
+        horariosContainer.innerHTML = `<p class="text-danger">No hay horarios disponibles.</p>`;
+        return;
+    }
 
-        lista.forEach(h => {
-            const btn = document.createElement("button");
-            btn.textContent = h;
-            btn.type = "button";
-            btn.className = "hora-btn";
+    // Obtener la fecha seleccionada
+    const fechaSeleccionada = new Date(fechaInput.value);
+    const hoy = new Date();
+    let listaFiltrada = lista;
 
-            btn.addEventListener("click", () => {
-                horaHidden.value = h;
-                horariosContainer.querySelectorAll("button").forEach(b => b.classList.remove("active"));
-                btn.classList.add("active");
-            });
+    // Filtrar solo horarios futuros si la fecha es hoy
+    if (
+        fechaSeleccionada.getFullYear() === hoy.getFullYear() &&
+        fechaSeleccionada.getMonth() === hoy.getMonth() &&
+        fechaSeleccionada.getDate() === hoy.getDate()
+    ) {
+        const horaActual = hoy.getHours();
+        const minutosActual = hoy.getMinutes();
 
-            horariosContainer.appendChild(btn);
+        listaFiltrada = lista.filter(horario => {
+            // Suponemos formato "HH:MM"
+            const [hh, mm] = horario.split(":").map(Number);
+            if (hh > horaActual) return true;
+            if (hh === horaActual && mm > minutosActual) return true;
+            return false;
         });
     }
 
+    if (listaFiltrada.length === 0) {
+        horariosContainer.innerHTML = `<p class="text-danger">No hay horarios disponibles para el resto del día.</p>`;
+        return;
+    }
+
+    // Renderizar botones
+    listaFiltrada.forEach(h => {
+        const btn = document.createElement("button");
+        btn.textContent = h;
+        btn.type = "button";
+        btn.className = "hora-btn";
+        btn.addEventListener("click", () => {
+            horaHidden.value = h;
+            horariosContainer.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+        });
+        horariosContainer.appendChild(btn);
+    });
+}
+
+
+
     async function cargarHorarios() {
-        if (!personas.value || !fecha.value || !zona.value) {
+        if (!personasInput.value || !fechaInput.value || !zonaInput.value) {
             horariosContainer.innerHTML = `<p class="text-muted">Selecciona primero personas, zona y fecha.</p>`;
             return;
         }
 
         horariosContainer.innerHTML = `<p>Cargando...</p>`;
 
-        const url = `/api/horarios/disponibles?personas=${personas.value}&fechaReserva=${fecha.value}&zona=${zona.value}`;
-
+        const url = `/api/horarios/disponibles?personas=${personasInput.value}&fechaReserva=${fechaInput.value}&zona=${zonaInput.value}`;
         try {
             const resp = await fetch(url);
             const data = await resp.json();
-            console.log("Horarios disponibles:", data);
             renderHorarios(data);
         } catch (error) {
             console.error("Error cargando horarios:", error);
@@ -116,20 +189,18 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    personas.addEventListener("change", cargarHorarios);
-    fecha.addEventListener("change", cargarHorarios);
-    zona.addEventListener("change", cargarHorarios);
+    personasInput.addEventListener("change", cargarHorarios);
+    fechaInput.addEventListener("change", cargarHorarios);
+    zonaInput.addEventListener("change", cargarHorarios);
 
     // ===============================
     //   ENVÍO DEL FORMULARIO
     // ===============================
-    const form = document.getElementById("formAgregarReserva");
     form.addEventListener("submit", (e) => {
         if (!horaHidden.value) {
-            e.preventDefault();
-            alert("Debes seleccionar una hora para la reserva.");
+            e.preventDefault(); // evitar envío si no se seleccionó hora
+            alert("Debes seleccionar un horario.");
         }
     });
 
 });
-

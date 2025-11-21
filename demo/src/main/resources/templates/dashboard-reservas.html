@@ -30,7 +30,7 @@
         <input type="text" placeholder="Nombre" th:field="*{clienteNombre}" required />
         <input type="text" placeholder="Apellido" th:field="*{clienteApellidos}" required />
         <input type="email" placeholder="Email" th:field="*{clienteEmail}" required />
-        <input type="tel" placeholder="Teléfono" th:field="*{clienteTelefono}" required />
+        <input type="tel" placeholder="Teléfono" th:field="*{clienteTelefono}"  maxlength="9"required />
         <input type="text" placeholder="DNI" th:field="*{numeroDocumento}" maxlength="8" required />
 
         <!-- Reserva -->
