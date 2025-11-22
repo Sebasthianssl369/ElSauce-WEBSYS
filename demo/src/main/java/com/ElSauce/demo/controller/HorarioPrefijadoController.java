@@ -21,4 +21,9 @@ public class HorarioPrefijadoController {
         // Este endpoint devolverá una lista de strings con las horas (ej: ["12:00:00", "12:15:00", ...])
         return horarioPrefijadoService.getAllHorasAsString();
     }
+
+    @GetMapping("/all")
+    public List<String> HorariosAll() {
+        return horarioPrefijadoService.getAllHorasAsString();
+    }
 }
