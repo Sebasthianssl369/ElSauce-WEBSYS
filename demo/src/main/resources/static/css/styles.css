@@ -1638,7 +1638,7 @@ h3 {
 }
 
 .footer-columna li,
-a {
+.footer-columna a {
   color: var(--color-fd-blanco);
   font-size: var(--text-sm);
   margin-bottom: 12px;
@@ -2713,3 +2713,4 @@ a {
 }
 
 /* Fin menú hamburguesa */
+

@@ -201,4 +201,98 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+
+    // ===============================
+// HORARIOS PARA EL FILTRO (LISTA)
+// ===============================
+const filterTimeContainer = document.getElementById("filterTimeContainer");
+const filterHoraHidden = document.getElementById("filterHora");
+
+if (filterTimeContainer) {
+    cargarHorariosFiltro();
+}
+
+function cargarHorariosFiltro() {
+    fetch("/api/horarios/listar")
+        .then(res => res.json())
+        .then(data => {
+            filterTimeContainer.innerHTML = "";
+
+            data.forEach(h => {
+                const horaStr = h.hora.substring(0, 5); // 14:00:00 -> 14:00
+
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "btn btn-outline-primary btn-sm";
+                btn.textContent = horaStr;
+
+                // Si ya hay un filtro aplicado
+                if (filterHoraHidden.value === horaStr) {
+                    btn.classList.remove("btn-outline-primary");
+                    btn.classList.add("btn-primary");
+                }
+
+                btn.addEventListener("click", () => {
+                    filterHoraHidden.value = horaStr;
+
+                    document
+                        .querySelectorAll("#filterTimeContainer button")
+                        .forEach(b => {
+                            b.classList.remove("btn-primary");
+                            b.classList.add("btn-outline-primary");
+                        });
+
+                    btn.classList.remove("btn-outline-primary");
+                    btn.classList.add("btn-primary");
+                });
+
+                filterTimeContainer.appendChild(btn);
+            });
+        })
+        .catch(err => {
+            console.error("Error cargando horarios de filtro:", err);
+            filterTimeContainer.innerHTML =
+                `<p class="text-danger">Error cargando horarios.</p>`;
+        });
+}
+
+
 });
+
+
+
+
+document.addEventListener("change", function (e) {
+    if (e.target.classList.contains("estado-select")) {
+        
+        const reservaId = e.target.getAttribute("data-id");
+        const nuevoEstado = e.target.value;
+
+        // Alerta de confirmación
+        if (!confirm("¿Está seguro de cambiar el estado a " + nuevoEstado + "?")) {
+            e.target.value = e.target.getAttribute("data-actual"); // regresar al valor previo
+            return;
+        }
+
+        // Petición al backend
+        fetch(`/admin/reservas/cambiar-estado/${reservaId}?estado=${nuevoEstado}`, {
+            method: "PUT"
+        })
+        .then(res => {
+            if (!res.ok) throw new Error("Error actualizando estado");
+            return res.json();
+        })
+        .then(data => {
+            alert("Estado actualizado correctamente");
+
+            // Actualizar el valor actual
+            e.target.setAttribute("data-actual", nuevoEstado);
+
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Error al actualizar el estado");
+        });
+    }
+});
+

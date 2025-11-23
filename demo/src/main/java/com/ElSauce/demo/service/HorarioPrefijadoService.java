@@ -1,10 +1,12 @@
 package com.ElSauce.demo.service;
 
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.ElSauce.demo.model.HorarioPrefijado;
 import com.ElSauce.demo.repository.HorarioPrefijadoRepository;
 
 @Service
@@ -22,5 +24,9 @@ public class HorarioPrefijadoService {
                 // Aquí usamos el formato predeterminado de LocalTime, ej: "12:30:00"
                 .map(horario -> horario.getHora().toString())
                 .collect(Collectors.toList());
+    }
+
+   public List<HorarioPrefijado> listarTodos() {
+        return horarioPrefijadoRepository.findAll();
     }
 }

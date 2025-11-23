@@ -248,4 +248,9 @@ button[type="submit"]:hover { background: #2ecc71; }
     font-weight: bold;
 }
 
+#filterTimeContainer .btn.btn-primary {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: white !important;
+}
 

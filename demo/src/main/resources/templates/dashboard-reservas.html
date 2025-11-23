@@ -1,325 +1,189 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-  <head th:replace="Fragmentos/AdminFrag::headRAdmin"></head>
-  <body>
-    <!-- ====== ENCABEZADO ====== -->
-    <div th:replace="Fragmentos/AdminFrag::headerAdmin"></div>
 
-    <main class="main-content">
-      <!-- ====== SIDEBAR ====== -->
-      <aside class="sidebar">
-        <button type="button" class="btn" data-section="add">
-          ➕ Agregar Reserva
-        </button>
-        <button type="button" class="btn" data-section="list">
-          📄 Ver Reservas
-        </button>
-      </aside>
+<head th:replace="Fragmentos/AdminFrag::headRAdmin"></head>
 
-      <!-- ====== CONTENIDO ====== -->
-      <section class="content">
-        <div th:if="${reservaGuardada}" class="alert alert-success">
-          ¡Reserva guardada exitosamente! ✅
-        </div>
+<body>
+  <!-- ====== ENCABEZADO ====== -->
+  <div th:replace="Fragmentos/AdminFrag::headerAdmin"></div>
 
-        <div id="section-add" class="section hidden">
-          <h2>➕ Agregar Nueva Reserva</h2>
-          <form
-            th:action="@{/dashboard-reservas/guardar}"
-            method="post"
-            th:object="${reserva}"
-            id="formAgregarReserva"
-          >
-            <!-- Redirección después de guardar -->
-            <input type="hidden" name="redirect" value="dashboard-reservas" />
+  <main class="main-content">
+    <!-- ====== SIDEBAR ====== -->
+    <aside class="sidebar">
+      <button type="button" class="btn" data-section="add">
+        ➕ Agregar Reserva
+      </button>
+      <button type="button" class="btn" data-section="list">
+        📄 Ver Reservas
+      </button>
+    </aside>
 
-            <!-- Datos del cliente -->
-            <input
-              type="text"
-              placeholder="Nombre"
-              th:field="*{clienteNombre}"
-              required
-            />
-            <input
-              type="text"
-              placeholder="Apellido"
-              th:field="*{clienteApellidos}"
-              required
-            />
-            <input
-              type="email"
-              placeholder="Email"
-              th:field="*{clienteEmail}"
-              required
-            />
-            <input
-              type="tel"
-              placeholder="Teléfono"
-              th:field="*{clienteTelefono}"
-              maxlength="9"
-              required
-            />
-            <input
-              type="text"
-              placeholder="DNI"
-              th:field="*{numeroDocumento}"
-              maxlength="8"
-              required
-            />
+    <!-- ====== CONTENIDO ====== -->
+    <section class="content">
+      <div th:if="${reservaGuardada}" class="alert alert-success">
+        ¡Reserva guardada exitosamente! ✅
+      </div>
 
-            <!-- Reserva -->
-            <input
-              type="number"
-              min="1"
-              placeholder="Nº de personas"
-              th:field="*{personas}"
-              id="personas"
-              required
-            />
-            <input
-              type="date"
-              th:field="*{fechaReserva}"
-              id="fechaReserva"
-              required
-            />
-            <select th:field="*{zona}" id="zona" required>
-              <option value="">Selecciona Zona</option>
-              <option
-                th:each="zona : ${zonas}"
-                th:value="${zona.id}"
-                th:text="${zona.nombre}"
-              >
-                Salón Bosque
-              </option>
-            </select>
+      <div id="section-add" class="section hidden">
+        <h2>➕ Agregar Nueva Reserva</h2>
+        <form th:action="@{/dashboard-reservas/guardar}" method="post" th:object="${reserva}" id="formAgregarReserva">
+          <!-- Redirección después de guardar -->
+          <input type="hidden" name="redirect" value="dashboard-reservas" />
 
-            <!-- Hora de reserva (oculto, se selecciona con botones) -->
-            <input type="hidden" name="horaReserva" id="horaReserva" required />
+          <!-- Datos del cliente -->
+          <input type="text" placeholder="Nombre" th:field="*{clienteNombre}" required />
+          <input type="text" placeholder="Apellido" th:field="*{clienteApellidos}" required />
+          <input type="email" placeholder="Email" th:field="*{clienteEmail}" required />
+          <input type="tel" placeholder="Teléfono" th:field="*{clienteTelefono}" maxlength="9" required />
+          <input type="text" placeholder="DNI" th:field="*{numeroDocumento}" maxlength="8" required />
 
-            <!-- Contenedor de botones horarios -->
-            <div id="horariosContainer" class="horarios-box">
-              <p class="text-muted">
-                Selecciona primero personas, zona y fecha.
-              </p>
+          <!-- Reserva -->
+          <input type="number" min="1" placeholder="Nº de personas" th:field="*{personas}" id="personas" required />
+          <input type="date" th:field="*{fechaReserva}" id="fechaReserva" required />
+          <select th:field="*{zona}" id="zona" required>
+            <option value="">Selecciona Zona</option>
+            <option th:each="zona : ${zonas}" th:value="${zona.id}" th:text="${zona.nombre}">
+              Salón Bosque
+            </option>
+          </select>
+
+          <!-- Hora de reserva (oculto, se selecciona con botones) -->
+          <input type="hidden" name="horaReserva" id="horaReserva" required />
+
+          <!-- Contenedor de botones horarios -->
+          <div id="horariosContainer" class="horarios-box">
+            <p class="text-muted">
+              Selecciona primero personas, zona y fecha.
+            </p>
+          </div>
+
+          <!-- Datos de pago -->
+          <h4>💳 Datos de Pago</h4>
+          <input type="text" placeholder="Número de tarjeta" id="numeroTarjeta" maxlength="16" required />
+          <input type="month" placeholder="MM/AAAA" id="fechaVencimiento" required />
+          <input type="text" placeholder="CVV" id="cvv" maxlength="4" required />
+
+          <!-- Monto calculado -->
+          <input type="text" id="monto" placeholder="Monto Total" readonly />
+
+          <button type="submit">Guardar Reserva</button>
+        </form>
+      </div>
+
+      <!-- Listado y filtros -->
+      <div id="section-list" class="section hidden">
+        <h2>Lista de Reservas</h2>
+
+        <div th:if="${successMessage}" class="alert alert-success mt-2" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger mt-2" th:text="${errorMessage}"></div>
+
+        <div class="card p-3 mb-4 shadow-sm">
+          <h5 class="card-title">🔍 Filtrar Reservas</h5>
+          <form method="GET" th:action="@{/dashboard-reservas}" id="formFiltros">
+            <div class="row g-3 d-flex align-items-end">
+              <div class="col-md-2">
+                <label for="filterId" class="form-label">ID Reserva</label>
+                <input type="number" class="form-control" id="filterId" name="filterId" th:value="${currentFilterId}" />
+              </div>
+
+              <div class="col-md-3">
+                <label for="filterDate" class="form-label">Fecha</label>
+                <input type="date" class="form-control" id="filterDate" name="filterDate"
+                  th:value="${currentFilterDate}" />
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Hora</label>
+                <div id="filterTimeContainer" class="d-flex flex-wrap gap-2"></div>
+                <input type="hidden" id="filterHora" name="filterTime" th:value="${currentFilterTime}" />
+              </div>
+              <div class="col-md-2">
+                <label for="filterPeople" class="form-label">Nº Personas (Mín.)</label>
+                <input type="number" class="form-control" id="filterPeople" name="filterPeople"
+                  th:value="${currentFilterPeople}" min="1" />
+              </div>
+
+              <div class="col-md-3">
+                <label for="filterName" class="form-label">Nombre/Apellido</label>
+                <input type="text" class="form-control" id="filterName" name="filterName"
+                  th:value="${currentFilterName}" />
+              </div>
             </div>
 
-            <!-- Datos de pago -->
-            <h4>💳 Datos de Pago</h4>
-            <input
-              type="text"
-              placeholder="Número de tarjeta"
-              id="numeroTarjeta"
-              maxlength="16"
-              required
-            />
-            <input
-              type="month"
-              placeholder="MM/AAAA"
-              id="fechaVencimiento"
-              required
-            />
-            <input
-              type="text"
-              placeholder="CVV"
-              id="cvv"
-              maxlength="4"
-              required
-            />
-
-            <!-- Monto calculado -->
-            <input type="text" id="monto" placeholder="Monto Total" readonly />
-
-            <button type="submit">Guardar Reserva</button>
+            <div class="mt-3">
+              <button type="submit" class="btn btn-primary me-2" id="btnAplicarFiltros">
+                Aplicar Filtro
+              </button>
+              <a th:href="@{/dashboard-reservas}" class="btn btn-secondary" id="btnLimpiarFiltros">Limpiar Filtros</a>
+            </div>
           </form>
         </div>
+        <table class="reserve-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Cliente</th>
+              <th>Teléfono</th>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Personas</th>
+              <th>Mesa</th>
+              <th>Zona</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="reserva : ${reservasList}">
+              <td th:text="${reserva.id}">123</td>
+              <td th:text="${reserva.clienteNombre} + ' ' + ${reserva.clienteApellidos}">
+                Juan Pérez
+              </td>
+              <td th:text="${reserva.clienteTelefono}">123456789</td>
+              <td th:text="${#temporals.format(reserva.fechaReserva, 'dd/MM/yyyy')}">
+                15/11/2025
+              </td>
+              <td th:text="${reserva.horaReserva}">19:30</td>
+              <td th:text="${reserva.personas}">4</td>
+              <td>
+                <span th:if="${reserva.mesa != null}" th:text="${reserva.mesa.numero}">M100</span>
+                <span th:unless="${reserva.mesa != null}">—</span>
+              </td>
 
-        <!-- Listado y filtros -->
-        <div id="section-list" class="section hidden">
-          <h2>Lista de Reservas</h2>
+              <td>
+                <span th:if="${reserva.zona != null}" th:text="${reserva.zona.nombre}">Muelle Panorámico Z</span>
+                <span th:unless="${reserva.mesa != null}">—</span>
+              </td>
+              <td>
+                <select class="form-select form-select-sm estado-select" th:data-id="${reserva.id}" th:data-actual="${reserva.estado}">
+                  <option value="PENDIENTE" th:selected="${reserva.estado.toString() =='PENDIENTE'} ">Pendiente</option>
+                  <option value="CANCELADA" th:selected="${reserva.estado.toString()=='CANCELADA'} ">Cancelado</option>
+                  <option value="ASISTIO" th:selected="${reserva.estado.toString()=='ASISTIO' }" >Asistió</option>
+                </select>
+              </td>
 
-          <div
-            th:if="${successMessage}"
-            class="alert alert-success mt-2"
-            th:text="${successMessage}"
-          ></div>
-          <div
-            th:if="${errorMessage}"
-            class="alert alert-danger mt-2"
-            th:text="${errorMessage}"
-          ></div>
+              <td>
+                <form th:action="@{/dashboard-reservas/eliminar}" method="post" style="display: inline">
+                  <input type="hidden" name="id" th:value="${reserva.id}" />
+                  <button type="submit" class="btn btn-danger btn-sm"
+                    th:onclick="'return confirm(\'¿Estás seguro de que quieres eliminar la reserva ID ' + ${reserva.id} + '?\');'">
+                    🗑️ Eliminar
+                  </button>
+                </form>
+              </td>
+            </tr>
+            <tr th:if="${reservasList.isEmpty()}">
+              <td colspan="8">
+                No se encontraron reservas con los filtros aplicados.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
 
-          <div class="card p-3 mb-4 shadow-sm">
-            <h5 class="card-title">🔍 Filtrar Reservas</h5>
-            <form
-              method="GET"
-              th:action="@{/dashboard-reservas}"
-              id="formFiltros"
-            >
-              <div class="row g-3 d-flex align-items-end">
-                <div class="col-md-2">
-                  <label for="filterId" class="form-label">ID Reserva</label>
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="filterId"
-                    name="filterId"
-                    th:value="${currentFilterId}"
-                  />
-                </div>
+  <script th:src="@{/scripts/dashboard-reservas.js}"></script>
+</body>
 
-                <div class="col-md-3">
-                  <label for="filterDate" class="form-label">Fecha</label>
-                  <input
-                    type="date"
-                    class="form-control"
-                    id="filterDate"
-                    name="filterDate"
-                    th:value="${currentFilterDate}"
-                  />
-                </div>
-
-                <div class="col-md-3">
-                  <label class="form-label">Hora</label>
-                  <div
-                    id="filterTimeContainer"
-                    class="d-flex flex-wrap gap-2"
-                  ></div>
-                  <input
-                    type="hidden"
-                    id="filterHora"
-                    name="filterHora"
-                    th:value="${currentFilterTime}"
-                  />
-                </div>
-                <div class="col-md-2">
-                  <label for="filterPeople" class="form-label"
-                    >Nº Personas (Mín.)</label
-                  >
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="filterPeople"
-                    name="filterPeople"
-                    th:value="${currentFilterPeople}"
-                    min="1"
-                  />
-                </div>
-
-                <div class="col-md-3">
-                  <label for="filterName" class="form-label"
-                    >Nombre/Apellido</label
-                  >
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="filterName"
-                    name="filterName"
-                    th:value="${currentFilterName}"
-                  />
-                </div>
-              </div>
-
-              <div class="mt-3">
-                <button
-                  type="submit"
-                  class="btn btn-primary me-2"
-                  id="btnAplicarFiltros"
-                >
-                  Aplicar Filtro
-                </button>
-                <a
-                  th:href="@{/dashboard-reservas}"
-                  class="btn btn-secondary"
-                  id="btnLimpiarFiltros"
-                  >Limpiar Filtros</a
-                >
-              </div>
-            </form>
-          </div>
-          <table class="reserve-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Cliente</th>
-                <th>Teléfono</th>
-                <th>Fecha</th>
-                <th>Hora</th>
-                <th>Personas</th>
-                <th>Mesa</th>
-                <th>Zona</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr th:each="reserva : ${reservasList}">
-                <td th:text="${reserva.id}">123</td>
-                <td
-                  th:text="${reserva.clienteNombre} + ' ' + ${reserva.clienteApellidos}"
-                >
-                  Juan Pérez
-                </td>
-                <td th:text="${reserva.clienteTelefono}">123456789</td>
-                <td
-                  th:text="${#temporals.format(reserva.fechaReserva, 'dd/MM/yyyy')}"
-                >
-                  15/11/2025
-                </td>
-                <td th:text="${reserva.horaReserva}">19:30</td>
-                <td th:text="${reserva.personas}">4</td>
-                <td>
-                  <span
-                    th:if="${reserva.mesa != null}"
-                    th:text="${reserva.mesa.numero}"
-                    >M100</span
-                  >
-                  <span th:unless="${reserva.mesa != null}">—</span>
-                </td>
-
-                <td>
-                  <span
-                    th:if="${reserva.zona != null}"
-                    th:text="${reserva.zona.nombre}"
-                    >Muelle Panorámico Z</span
-                  >
-                  <span th:unless="${reserva.mesa != null}">—</span>
-                </td>
-                <td>
-                  <span
-                    th:if="${reserva.Estado != null}"
-                    th:text="${reserva.Estado}"
-                    >---</span
-                  >
-                  <span th:unless="${reserva.Estado != null}">—</span>
-                </td>
-                <td>
-                  <form
-                    th:action="@{/dashboard-reservas/eliminar}"
-                    method="post"
-                    style="display: inline"
-                  >
-                    <input type="hidden" name="id" th:value="${reserva.id}" />
-                    <button
-                      type="submit"
-                      class="btn btn-danger btn-sm"
-                      th:onclick="'return confirm(\'¿Estás seguro de que quieres eliminar la reserva ID ' + ${reserva.id} + '?\');'"
-                    >
-                      🗑️ Eliminar
-                    </button>
-                  </form>
-                </td>
-              </tr>
-              <tr th:if="${reservasList.isEmpty()}">
-                <td colspan="8">
-                  No se encontraron reservas con los filtros aplicados.
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </main>
-
-    <script th:src="@{/scripts/dashboard-reservas.js}"></script>
-  </body>
 </html>

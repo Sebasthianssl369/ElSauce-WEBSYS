@@ -1,11 +1,5 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-    <head th:fragment="headMAdmin">
-        <meta charset="UTF-8" />
-        <title>Dashboard-menu</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet" th:href="@{/css/dashboard-menu.css}" />
-    </head>
     <head th:fragment="headRAdmin">
         <meta charset="UTF-8" />
         <title>Dashboard-reservas</title>
@@ -18,7 +12,6 @@
         
       <h1>Panel de Administración</h1>
       <nav class="nav">
-        <form th:action="@{/dashboard-menu}" method="post"><button th:href="@{/dashboard-menu}" class="active">Menú</button></form>
         <form th:action="@{/dashboard-reservas}" method="post"><button th:href="@{/dashboard-reservas}">Reservas</button></form>
         <a th:href="@{/admin}">Cerrar Sesión</a>
 

@@ -4,6 +4,8 @@ import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.ElSauce.demo.model.HorarioPrefijado;
 import com.ElSauce.demo.service.HorarioPrefijadoService;
 
 @RestController
@@ -22,8 +24,8 @@ public class HorarioPrefijadoController {
         return horarioPrefijadoService.getAllHorasAsString();
     }
 
-    @GetMapping("/all")
-    public List<String> HorariosAll() {
-        return horarioPrefijadoService.getAllHorasAsString();
+    @GetMapping("/listar")
+    public List<HorarioPrefijado> listar() {
+        return horarioPrefijadoService.listarTodos();
     }
 }
