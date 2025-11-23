@@ -237,9 +237,9 @@ body{ background-color: var(--color-fd-blanco);}
   border-radius: 8px;
   
   /* --- ANIMACIÓN INICIAL --- */
-  opacity: 0;
-  transform: translateY(50px);
-  transition: transform 0.6s ease, opacity 0.6s ease;
+  opacity: 1; /* ¡CAMBIADO de 0 a 1! */
+    transform: translateY(0); /* ¡CAMBIADO de 50px a 0! */
+    transition: transform 0.6s ease, opacity 0.6s ease;
 }
 
 /* Cuando el JS detecta que entran en pantalla */

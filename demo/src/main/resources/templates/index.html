@@ -56,58 +56,16 @@
 
     <div class="carousel-container">
       <button class="carousel-btn prev">‹</button>
-      <div class="cards-wrapper">
-        <div class="card">
-          <div class="image-wrapper"><img th:src="@{/imgs/juane.jpg}" alt="Juane de gallina"></div>
-          <div class="card-body">
-            <h5 class="card-title">Juane de gallina</h5>
-            <p class="card-text">El clásico de la selva, preparado con arroz, huevo y gallina, envuelto en hojas de bijao.</p>
-            <a href="#" class="btn btn-primary">Ver más</a>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="image-wrapper"><img th:src="@{/imgs/cecina.jpg}" alt="Tacacho con cecina"></div>
-          <div class="card-body">
-            <h5 class="card-title">Tacacho con cecina</h5>
-            <p class="card-text">Plátano verde asado y amasado acompañado de cecina ahumada, un sabor tradicional e inconfundible.</p>
-            <a href="#" class="btn btn-primary">Ver más</a>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="image-wrapper"><img th:src="@{/imgs/patarashca.jpg}" alt="Patarashca"></div>
-          <div class="card-body">
-            <h5 class="card-title">Patarashca</h5>
-            <p class="card-text">Pescado fresco sazonado con hierbas aromáticas y cocinado envuelto en hojas de bijao.</p>
-            <a href="#" class="btn btn-primary">Ver más</a>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="image-wrapper"><img th:src="@{/imgs/otro.jpg}" alt="Otro plato"></div>
-          <div class="card-body">
-            <h5 class="card-title">Otro plato</h5>
-            <p class="card-text">Descripción del plato para mostrar más opciones de la carta.</p>
-            <a href="#" class="btn btn-primary">Ver más</a>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="image-wrapper"><img th:src="@{/imgs/extra.jpg}" alt="Extra"></div>
-          <div class="card-body">
-            <h5 class="card-title">Extra</h5>
-            <p class="card-text">Otra deliciosa opción de nuestra carta que puedes explorar.</p>
-            <a href="#" class="btn btn-primary">Ver más</a>
-          </div>
-        </div>
-
+      <div class="cards-wrapper" id="cardsWrapper">
+        
       </div>
       <button class="carousel-btn next">›</button>
     </div>
   </div>
 </section>
-
+<script th:inline="javascript">
+    window.platosData = /*[[${platos}]]*/ [];
+</script>
 
         <section class="video-section" id="recorrido">
 
@@ -240,6 +198,7 @@
     <a href="#" class="scroll-up">
         <i class="fa-solid fa-angle-up"></i>
     </a>
-    <script src="scripts/scripts.js"></script>
+    <script th:src="@{/scripts/carta.js}"></script>
+    
 </body>
 </html>
