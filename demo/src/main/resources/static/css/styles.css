@@ -2713,4 +2713,14 @@ h3 {
 }
 
 /* Fin menú hamburguesa */
+/* === FIX DEFINITIVO PARA QUE EL DROPDOWN SE VEA === */
+.navbar,
+.navbar * {
+    overflow: visible !important;
+}
+
+.dropdown-menu {
+    position: absolute !important;
+    z-index: 5000 !important;
+}
 

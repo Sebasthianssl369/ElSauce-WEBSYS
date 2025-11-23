@@ -1,5 +1,6 @@
 package com.ElSauce.demo.controller;
 
+import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.security.SecureRandom;
@@ -11,6 +12,9 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
@@ -23,6 +27,7 @@ import com.ElSauce.demo.model.User;
 import com.ElSauce.demo.model.Zona;
 import com.ElSauce.demo.service.MesaService;
 import com.ElSauce.demo.service.PagoService;
+import com.ElSauce.demo.service.PdfService;
 import com.ElSauce.demo.service.ReservaService;
 import com.ElSauce.demo.service.ZonaService;
 
@@ -181,4 +186,34 @@ public String postMethodName(@ModelAttribute Reserva reserva,
     
 
     
-}}
+}
+
+@Autowired
+    private PdfService pdfService;
+
+    @GetMapping("/reserva/pdf")
+    public ResponseEntity<byte[]> generarPdf(@RequestParam Long id) {
+
+        Optional<Reserva> reservaOpt = reservaService.buscarReservaPorId(id);
+
+        if (reservaOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Reserva reserva = reservaOpt.get();
+
+        ByteArrayInputStream pdfBytes = pdfService.generarPDFReserva(reserva);
+
+        byte[] bytes = pdfBytes.readAllBytes();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=Reserva_" + id + ".pdf");
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(bytes);
+    }
+
+}
