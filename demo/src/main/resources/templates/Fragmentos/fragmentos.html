@@ -109,25 +109,24 @@
                 </div>
 
                 <!-- Usuario logueado -->
-                <div th:if="${usuarioLogeado != null}" class="dropdown">
-                    <button class="btn btn-outline-light dropdown-toggle" id="userMenu"
-                            data-bs-toggle="dropdown">
-                        <i class="fa-solid fa-user me-1"></i>
-                        <span th:text="${usuarioLogeado.nombre}">Usuario</span>
-                    </button>
+                <div th:if="${usuarioLogeado != null}" class="d-flex align-items-center gap-3">
+    <!-- Nombre con icono en blanco -->
+    <div class="d-flex align-items-center text-white">
+        <i class="fa-solid fa-user me-1"></i>
+        <span th:text="${usuarioLogeado.nombre}">Usuario</span>
+    </div>
 
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-                        <li><a class="dropdown-item" th:href="@{/perfil}">
-                            <i class="fa-solid fa-id-card me-1"></i> Mis Reservas
-                        </a></li>
+    <!-- Botón Mis Reservas -->
+    <a class="btn btn-outline-light d-flex align-items-center" th:href="@{/misReservas}">
+        <i class="fa-solid fa-id-card me-1"></i> Mis Reservas
+    </a>
 
-                        <li><hr class="dropdown-divider"></li>
+    <!-- Botón Cerrar sesión -->
+    <a class="btn btn-outline-danger d-flex align-items-center" th:href="@{/auth/logout}">
+        <i class="fa-solid fa-right-from-bracket me-1"></i> Cerrar sesión
+    </a>
+</div>
 
-                        <li><a class="dropdown-item text-danger" th:href="@{/auth/logout}">
-                            <i class="fa-solid fa-right-from-bracket me-1"></i> Cerrar sesión
-                        </a></li>
-                    </ul>
-                </div>
 
             </div>
         </div>

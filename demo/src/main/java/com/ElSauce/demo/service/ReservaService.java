@@ -121,6 +121,12 @@ public class ReservaService {
 
 
 
+public List<Reserva> buscarPorUsuarioYFechaMayorOIgual(Long userId, LocalDate fecha) {
+    return reservaRepository.findByUser_IdAndFechaReservaGreaterThanEqualOrderByFechaReservaAsc(userId, fecha);
+}
 
+public List<Reserva> buscarPorUsuarioYFechaMenor(Long userId, LocalDate fecha) {
+    return reservaRepository.findByUser_IdAndFechaReservaLessThanOrderByFechaReservaDesc(userId, fecha);
+}
 
 }

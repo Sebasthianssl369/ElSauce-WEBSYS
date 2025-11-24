@@ -8,6 +8,8 @@ import com.ElSauce.demo.model.User;
 import com.ElSauce.demo.repository.PlatoRepository;
 
 import jakarta.servlet.http.HttpSession;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 
@@ -35,32 +37,44 @@ public class InicioController {
         return "index";
     }
      @GetMapping({"/nosotros"})
-    public String nosotros(){
+    public String nosotros(Model model, HttpSession session) {
+    User usuario = (User) session.getAttribute("usuarioLogeado");
+    model.addAttribute("usuarioLogeado", usuario); 
         return "nosotros";
     }
      @GetMapping({"/galeria"})
-    public String galeria(){
+    public String galeria(Model model, HttpSession session) {
+    User usuario = (User) session.getAttribute("usuarioLogeado");
+    model.addAttribute("usuarioLogeado", usuario); 
         return "galeria";
     }
      @GetMapping({"/eventos"})
-    public String eventos(){
+    public String eventos(Model model, HttpSession session) {
+    User usuario = (User) session.getAttribute("usuarioLogeado");
+    model.addAttribute("usuarioLogeado", usuario); 
         return "eventos";
     }
      @GetMapping({"/noticias"})
-    public String noticias(){
+    public String noticias(Model model, HttpSession session) {
+    User usuario = (User) session.getAttribute("usuarioLogeado");
+    model.addAttribute("usuarioLogeado", usuario); 
         return "noticias";
     }
  
     @GetMapping({"/login"})
-    public String login(){
+    public String login(Model model, HttpSession session) {
+    User usuario = (User) session.getAttribute("usuarioLogeado");
+    model.addAttribute("usuarioLogeado", usuario); 
         return "login";
     }
     
     
     @GetMapping({"/registro"})
-    public String registro(){
+    public String registro(Model model, HttpSession session) {
+    User usuario = (User) session.getAttribute("usuarioLogeado");
+    model.addAttribute("usuarioLogeado", usuario); 
         return "registro";
     }
 
-
+    
 }

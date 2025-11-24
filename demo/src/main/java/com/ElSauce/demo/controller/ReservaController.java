@@ -15,6 +15,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
@@ -29,6 +30,7 @@ import com.ElSauce.demo.service.MesaService;
 import com.ElSauce.demo.service.PagoService;
 import com.ElSauce.demo.service.PdfService;
 import com.ElSauce.demo.service.ReservaService;
+
 import com.ElSauce.demo.service.ZonaService;
 
 import jakarta.servlet.http.HttpSession;
@@ -54,6 +56,7 @@ public class ReservaController {
 
     @Autowired
     private MesaService mesaService;
+
 
     @GetMapping("/reserva")
     public String paginaReserva(Model model, HttpSession session) {
@@ -216,5 +219,25 @@ public String postMethodName(@ModelAttribute Reserva reserva,
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(bytes);
     }
+
+   @GetMapping("/misReservas")
+public String verReservas(Model model, HttpSession session) {
+    User usuario = (User) session.getAttribute("usuarioLogeado");
+    model.addAttribute("usuarioLogeado", usuario); 
+    if (usuario == null) {
+        // Si no hay usuario en sesión, redirigir a home o login
+        return "redirect:/index";
+    }
+
+    LocalDate hoy = LocalDate.now();
+
+    List<Reserva> futurasReservas = reservaService.buscarPorUsuarioYFechaMayorOIgual(usuario.getId(), hoy);
+    List<Reserva> reservasAnteriores = reservaService.buscarPorUsuarioYFechaMenor(usuario.getId(), hoy);
+
+    model.addAttribute("futurasReservas", futurasReservas);
+    model.addAttribute("reservasAnteriores", reservasAnteriores);
+
+    return "misReservas"; 
+}
 
 }

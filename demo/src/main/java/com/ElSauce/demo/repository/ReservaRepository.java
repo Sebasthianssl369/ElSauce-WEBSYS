@@ -21,8 +21,8 @@ public interface ReservaRepository extends JpaRepository<Reserva,Long>{
     List<Reserva> findByPersonasGreaterThanEqual(Integer personas);
     List<Reserva> findByHoraReserva(LocalTime horaReserva);
     boolean existsByMesaAndFechaReservaAndHoraReservaAndEstadoIn(Mesa mesa, LocalDate fecha, LocalTime hora, List<EstadoReserva> estados);
-
-
+     List<Reserva> findByUser_IdAndFechaReservaGreaterThanEqualOrderByFechaReservaAsc(Long userId, LocalDate fecha);
+     List<Reserva> findByUser_IdAndFechaReservaLessThanOrderByFechaReservaDesc(Long userId, LocalDate fecha);
     @Query("""
     SELECT r.horaReserva
     FROM Reserva r
