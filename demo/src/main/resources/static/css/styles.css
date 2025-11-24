@@ -2720,7 +2720,6 @@ h3 {
 }
 
 .dropdown-menu {
-    position: absolute !important;
-    z-index: 5000 !important;
+    z-index: 1050 !important;
 }
 
