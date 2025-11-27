@@ -109,9 +109,9 @@ CREATE TABLE reservas (
   fecha_reserva DATE NOT NULL,
   hora_reserva TIME NOT NULL,
   personas TINYINT UNSIGNED NOT NULL CHECK (personas BETWEEN 1 AND 8),
-  tipo ENUM('BOLETA','FACTURA') DEFAULT 'BOLETA',
+  tipo ENUM('BOLETA') DEFAULT 'BOLETA',
   numero_documento VARCHAR(50),
-  estado ENUM('PENDIENTE','CONFIRMADA','CANCELADA','ASISTIO') DEFAULT 'PENDIENTE',
+  estado ENUM('PENDIENTE','CANCELADA','ASISTIO') DEFAULT 'PENDIENTE',
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   CONSTRAINT fk_reservas_user FOREIGN KEY (user_id)
@@ -192,8 +192,16 @@ INSERT INTO mesas (numero, zona_id, capacidad) VALUES
  ('M9', 3, 2), ('M10', 3, 4),('M11', 3, 6), ('M12', 3, 8);
 
 -- Platos
-INSERT INTO platos (nombre, precio, descripcion, imagen_ruta)
-VALUES ('Trucha a la parrilla', 38.50, 'Trucha fresca con hierbas y limón.', '/uploads/platos/trucha_parrilla.jpg');
+INSERT INTO platos (id, nombre, precio, descripcion, imagen_ruta, created_at, updated_at) VALUES
+(2, 'Tacacho con Cecina', 40.00, 'Plátano bellaco asado y majado acompañado con cecina frita.', '/imgs/platos/tacacho.jpg', NOW(), NOW()),
+(3, 'Juane', 25.00, 'Arroz sazonado con especias, pollo y huevo envuelto en hoja de bijao.', '/imgs/platos/juane.jpg', NOW(), NOW()),
+(4, 'Inchicapi', 22.00, 'Sopa tradicional de maní, gallina, yuca y maíz.', '/imgs/platos/inchicapi.jpg', NOW(), NOW()),
+(5, 'Patarashca', 35.00, 'Pescado de río marinado y cocinado dentro de hoja de bijao.', '/imgs/platos/patarashca.jpg', NOW(), NOW()),
+(6, 'Cecina con Arroz Chaufa Amazónico', 32.00, 'Chaufa preparado con cecina, plátano frito y especias amazónicas.', '/imgs/platos/chaufa_cecina.jpg', NOW(), NOW()),
+(7, 'Ensalada de Chonta', 18.00, 'Ensalada fresca de palmito amazónico con tomate, limón y culantro.', '/imgs/platos/chonta.jpg', NOW(), NOW()),
+(8, 'Paiche a la Plancha', 48.00, 'Filete de paiche a la plancha con yuca y ensalada.', '/imgs/platos/paiche_plancha.jpg', NOW(), NOW()),
+(9, 'Pescado Enrollado en Hoja', 37.00, 'Filete de pescado sazonado y cocinado en hoja de bijao.', '/imgs/platos/pescado_bijao.jpg', NOW(), NOW()),
+(10, 'Caldo de Carachama', 28.00, 'Sopa elaborada con carachama, yuca y hierbas amazónicas.', '/imgs/platos/caldo_carachama.jpg', NOW(), NOW());
 
 -- Reserva de ejemplo
 SET @zona_bosque_id = (SELECT id FROM zonas WHERE nombre = 'Salón Bosque' LIMIT 1);
