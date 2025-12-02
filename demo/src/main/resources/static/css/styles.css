@@ -134,7 +134,7 @@ body{ background-color: var(--color-fd-blanco);}
 
 /*Carrusel*/
 .carrusel {
-  padding-top: 80px;
+  padding-top: 64px;
 }
 
 .carousel-caption-overlay {
@@ -1278,7 +1278,7 @@ TE PUEDE SERVIR PARA EL RESPONSIVE, GIAN
   flex-shrink: 0;
 }
 
-.content {
+.galery-content {
   width: 100%;
   height: 100%;
   display: flex;
@@ -1291,12 +1291,13 @@ TE PUEDE SERVIR PARA EL RESPONSIVE, GIAN
   border-radius: 12px;
 }
 
+
 .content h2,a {
   color: var(--color-arena);
   margin: 10px 0;
 }
 
-.galery:hover .content {
+.galery:hover .galery-content {
   opacity: 1;
 }
 
@@ -2723,3 +2724,27 @@ h3 {
     z-index: 1050 !important;
 }
 
+/* Fondo de video en la sección "Nuestra carta" */
+.video-bg {
+    position: relative;
+    overflow: hidden;
+    min-height: 100vh; /* evita fondo gris */
+}
+
+/* Video como fondo */
+.video-bg video#video-carta-bg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    transform: translate(-50%, -50%);
+    z-index: -1; /* detrás del contenido */
+}
+
+/* Asegura que el contenido esté por encima del video */
+.clases-container {
+    position: relative;
+    z-index: 2;
+}

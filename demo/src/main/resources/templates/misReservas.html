@@ -37,7 +37,7 @@
             <td>
                 <td>
     <a th:href="@{/reserva/pdf(id=${reserva.id})}" class="btn btn-outline-primary btn-sm" title="Descargar PDF">
-        ⬇️
+        <i class="fa-solid fa-download"></i>⬇
     </a>
 </td>
 
@@ -65,7 +65,7 @@
             <td th:text="${reserva.zona.nombre}">Zona B</td>
             <td>
                 <a th:href="@{/reserva/pdf(id=${reserva.id})}" class="btn btn-outline-primary btn-sm">
-                    <i class="fa-solid fa-download"></i>⬇️
+                    <i class="fa-solid fa-download"></i>⬇
                 </a>
             </td>
         </tr>
