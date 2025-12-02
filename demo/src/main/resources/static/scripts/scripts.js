@@ -675,3 +675,35 @@ slides.forEach(slide => {
     // Inicialización: Muestra el primer paso al cargar
     showStep(0);
 });
+
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    let reservaActiva = true;
+
+    // Solo enlaces dentro de la página que NO formen parte del formulario
+    const contenedorReserva = document.querySelector(".reserva-container");
+
+    if (!contenedorReserva) return;
+
+    const enlacesNavbar = document.querySelectorAll("nav a");
+
+    enlacesNavbar.forEach(link => {
+        link.addEventListener("click", function(e){
+            if (!reservaActiva) return; // si ya salió, no bloquear nada
+
+            const confirmar = confirm(
+                "¿Estás seguro que deseas salir? Los datos de la reserva no se guardarán."
+            );
+
+            if (!confirmar) {
+                e.preventDefault();
+                return;
+            }
+
+            // si aceptó, desactivamos la reserva y dejamos navegar normalmente
+            reservaActiva = false;
+        });
+    });
+
+});
