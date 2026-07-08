@@ -7,6 +7,7 @@ import java.time.LocalTime;
 import com.ElSauce.demo.Enum.EstadoReserva;
 import com.ElSauce.demo.Enum.TipoDocumento;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
@@ -14,19 +15,23 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "reservas")
 public class Reserva {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     // Relaciones
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "mesa_id")
     private Mesa mesa;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "zona_id")
     private Zona zona;
@@ -66,10 +71,11 @@ public class Reserva {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+    
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    //Getter y Setter
+    // Getter y Setter
     public Long getId() {
         return id;
     }
@@ -166,12 +172,10 @@ public class Reserva {
     public void setNumeroDocumento(String numeroDocumento) {
         this.numeroDocumento = numeroDocumento;
     }
-   
     public EstadoReserva getEstado() {
         return estado;
     }
     public void setEstado(EstadoReserva estado) {
         this.estado = estado;
     }
-
 }

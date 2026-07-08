@@ -3,6 +3,7 @@ package com.ElSauce.demo.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "zonas")
 public class Zona {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -28,6 +30,7 @@ public class Zona {
     @OneToMany(mappedBy = "zona", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Mesa> mesas;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "zona", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Reserva> reservas;
 
@@ -87,6 +90,4 @@ public class Zona {
         this.reservas = reservas;
     }
 
-    //Getter and Setter
-    
 }

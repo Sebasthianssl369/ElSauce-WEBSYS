@@ -1,5 +1,8 @@
 package com.ElSauce.demo.service;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.ElSauce.demo.model.Role;
 import com.ElSauce.demo.model.User;
@@ -41,12 +44,12 @@ public class UserService {
     }
 
     // Login sencillo
-     public User login(String email, String password) {
-    User user = userRepository.findByEmail(email);
-    if (user != null && passwordEncoder.matches(password, user.getPasswordHash())) {
-        return user;
-    }
-    return null;
+    public User login(String email, String password) {
+        User user = userRepository.findByEmail(email);
+        if (user != null && passwordEncoder.matches(password, user.getPasswordHash())) {
+            return user;
+        }
+        return null;
     }
 
     public boolean existsByEmail(String email) {
@@ -56,5 +59,21 @@ public class UserService {
     public User findByEmail(String email){
         return userRepository.findByEmail(email);
     }
-}
 
+    // --- MÉTODOS NUEVOS AGREGADOS AQUÍ ---
+
+    // Obtener todos los usuarios
+    public List<User> obtenerTodos() {
+        return userRepository.findAll();
+    }
+
+    // Obtener usuario por ID
+    public Optional<User> obtenerPorId(Long id) {
+        return userRepository.findById(id);
+    }
+
+    // Eliminar usuario
+    public void eliminar(Long id) {
+        userRepository.deleteById(id);
+    }
+}
